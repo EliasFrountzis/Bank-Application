@@ -1,4 +1,5 @@
 com\bank\Account.class
 com\bank\BankApplication.class
+com\bank\AccountController.class
 com\bank\AccountRequest.class
 com\bank\AccountService.class

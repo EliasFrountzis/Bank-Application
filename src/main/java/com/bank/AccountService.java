@@ -28,4 +28,20 @@ public class AccountService {
     public List<Account> getAccounts() {
         return accounts;
     }
+
+    public Account getAccountById(int id) {
+
+    for (int i = 0; i < accounts.size(); i++) {
+
+        Account account = accounts.get(i);
+
+        if (account.getId() == id) {
+            return account;
+        }
+
+    }
+
+    return null;
+}
+
 }
