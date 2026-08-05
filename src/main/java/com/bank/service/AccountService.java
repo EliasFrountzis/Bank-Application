@@ -1,7 +1,9 @@
-package com.bank;
+package com.bank.service;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.bank.model.Account;
 
 public class AccountService {
 

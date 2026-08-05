@@ -1,4 +1,4 @@
-package com.bank;
+package com.bank.request;
 
 public class TransferRequest {
 
