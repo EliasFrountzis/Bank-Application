@@ -1,5 +1,8 @@
-com\bank\Account.class
 com\bank\BankApplication.class
-com\bank\AccountController.class
 com\bank\AccountRequest.class
+com\bank\Account.class
+com\bank\TransferService.class
+com\bank\TransferRequest.class
+com\bank\AccountController.class
+com\bank\TransferController.class
 com\bank\AccountService.class

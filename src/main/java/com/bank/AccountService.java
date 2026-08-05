@@ -26,7 +26,7 @@ public class AccountService {
 }
 
     public List<Account> getAccounts() {
-        return accounts;
+        return new ArrayList<>(accounts);
     }
 
     public Account getAccountById(int id) {
