@@ -1,4 +1,4 @@
-package com.bank.request;
+package com.bank.dto.request;
 
 public class TransferRequest {
 

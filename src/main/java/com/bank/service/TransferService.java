@@ -26,7 +26,14 @@ public class TransferService {
 
         Account receiver = accountService.getAccountById(toId);
 
+if(fromId == toId){
 
+        throw new BankException(
+                "Cannot transfer to the same account",
+                400
+        );
+
+    }
     
 
        if(amount <= 0){

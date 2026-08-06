@@ -2,6 +2,7 @@ package com.bank.controller;
 
 import static spark.Spark.*;
 
+import com.bank.dto.response.TransactionResponse;
 import com.bank.service.TransactionService;
 import com.google.gson.Gson;
 
@@ -18,12 +19,15 @@ public class TransactionController {
 
     public void registerRoutes() {
 
-        get("/transactions", (request, response) -> {
+       get("/transactions", (request, response) -> {
 
     response.type("application/json");
 
     return gson.toJson(
-            transactionService.getTransactions()
+        transactionService.getTransactions()
+            .stream()
+            .map(TransactionResponse::new)
+            .toList()
     );
 
 });
@@ -41,9 +45,11 @@ public class TransactionController {
 
 
     return gson.toJson(
-            transactionService.getTransactionsByAccount(accountId)
-    );
-
+    transactionService.getTransactionsByAccount(accountId)
+        .stream()
+        .map(TransactionResponse::new)
+        .toList()
+);
 });
 
     }

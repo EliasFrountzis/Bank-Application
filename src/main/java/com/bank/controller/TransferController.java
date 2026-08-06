@@ -2,8 +2,8 @@ package com.bank.controller;
 
 import static spark.Spark.*;
 
+import com.bank.dto.request.TransferRequest;
 import com.bank.service.TransferService;
-import com.bank.request.TransferRequest;
 import com.google.gson.Gson;
 
 public class TransferController {
@@ -19,22 +19,36 @@ public class TransferController {
 
     public void registerRoutes() {
 
-        post("/transfer", (request, response) -> {
+       post("/transfer", (request, response) -> {
 
-    TransferRequest transferRequest =
-            gson.fromJson(request.body(), TransferRequest.class);
+    try {
 
-
-    transferService.transfer(
-            transferRequest.fromAccount,
-            transferRequest.toAccount,
-            transferRequest.amount
-    );
+        TransferRequest transferRequest =
+                gson.fromJson(request.body(), TransferRequest.class);
 
 
-    response.type("application/json");
+        transferService.transfer(
+                transferRequest.fromAccount,
+                transferRequest.toAccount,
+                transferRequest.amount
+        );
 
-    return gson.toJson("Transfer completed");
+
+       response.status(200);
+response.type("application/json");
+
+return """
+{
+    "message": "Transfer completed successfully"
+}
+""";
+    } catch(Exception e) {
+
+        e.printStackTrace();
+
+        throw e;
+
+    }
 
 });
 

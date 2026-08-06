@@ -7,8 +7,8 @@ import com.bank.controller.TransferController;
 
 import com.bank.service.AccountService;
 import com.bank.repository.AccountRepository;
-import com.bank.repository.InMemoryAccountRepository;
-import com.bank.repository.InMemoryTransactionRepository;
+import com.bank.repository.PostgresAccountRepository;
+import com.bank.repository.PostgresTransactionRepository;
 import com.bank.repository.TransactionRepository;
 import com.bank.service.TransferService;
 import com.bank.service.TransactionService;
@@ -20,7 +20,7 @@ public class BankApplication {
 
 
   private static final AccountRepository accountRepository =
-        new InMemoryAccountRepository();
+        new PostgresAccountRepository();
 
 
 private static final AccountService accountService =
@@ -29,7 +29,7 @@ private static final AccountService accountService =
 
 
 private static final TransactionRepository transactionRepository =
-        new InMemoryTransactionRepository();
+        new PostgresTransactionRepository();
 
 
 private static final TransactionService transactionService =

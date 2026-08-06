@@ -3,9 +3,11 @@ package com.bank.controller;
 import static spark.Spark.*;
 
 import com.bank.service.AccountService;
+import com.bank.dto.request.AccountRequest;
+import com.bank.dto.response.AccountResponse;
 import com.bank.model.Account;
-import com.bank.request.AccountRequest;
 import com.google.gson.Gson;
+import java.util.List;
 
 public class AccountController {
 
@@ -38,7 +40,9 @@ public class AccountController {
 
             response.type("application/json");
 
-            return gson.toJson(account);
+            return gson.toJson(
+    new AccountResponse(account)
+);
 
         });
 
@@ -46,11 +50,17 @@ public class AccountController {
 
         get("/accounts", (request, response) -> {
 
-            response.type("application/json");
+    response.type("application/json");
 
-            return gson.toJson(accountService.getAccounts());
+    List<AccountResponse> responses =
+            accountService.getAccounts()
+                    .stream()
+                    .map(AccountResponse::new)
+                    .toList();
 
-        });
+    return gson.toJson(responses);
+
+});
 
 
         get("/accounts/:id", (request, response) -> {
@@ -62,7 +72,9 @@ public class AccountController {
 
 response.type("application/json");
 
-return gson.toJson(account);
+return gson.toJson(
+    new AccountResponse(account)
+);
 
 });
 

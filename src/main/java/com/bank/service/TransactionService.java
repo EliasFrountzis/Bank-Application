@@ -1,5 +1,6 @@
 package com.bank.service;
 
+import com.bank.exception.BankException;
 import com.bank.model.Transaction;
 import com.bank.repository.TransactionRepository;
 
@@ -11,6 +12,8 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
 
     private int nextId = 1;
+
+
     public TransactionService(
             TransactionRepository transactionRepository
     ){
@@ -24,16 +27,37 @@ public class TransactionService {
             double amount
     ){
 
+        if (fromId == toId) {
+
+            throw new BankException(
+                    "Cannot transfer money to the same account",
+                    400
+            );
+
+        }
+
+
+        if (amount <= 0) {
+
+            throw new BankException(
+                    "Transaction amount must be positive",
+                    400
+            );
+
+        }
+
+
         Transaction transaction =
-        new Transaction(
-                nextId++,
-                fromId,
-                toId,
-                amount
-        );
+                new Transaction(
+                        nextId++,
+                        fromId,
+                        toId,
+                        amount
+                );
 
 
         return transactionRepository.save(transaction);
+
     }
 
 
@@ -43,10 +67,11 @@ public class TransactionService {
 
     }
 
+
     public List<Transaction> getTransactionsByAccount(int accountId){
 
-    return transactionRepository.findByAccountId(accountId);
+        return transactionRepository.findByAccountId(accountId);
 
-}
+    }
 
 }
