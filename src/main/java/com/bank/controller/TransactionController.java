@@ -20,11 +20,31 @@ public class TransactionController {
 
         get("/transactions", (request, response) -> {
 
-            response.type("application/json");
+    response.type("application/json");
 
-            return gson.toJson(transactionService.getTransactions());
+    return gson.toJson(
+            transactionService.getTransactions()
+    );
 
-        });
+});
+
+       get("/accounts/:id/transactions", (request, response) -> {
+
+
+    int accountId =
+            Integer.parseInt(
+                    request.params(":id")
+            );
+
+
+    response.type("application/json");
+
+
+    return gson.toJson(
+            transactionService.getTransactionsByAccount(accountId)
+    );
+
+});
 
     }
 

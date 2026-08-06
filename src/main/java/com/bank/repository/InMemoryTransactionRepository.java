@@ -31,4 +31,30 @@ public class InMemoryTransactionRepository
 
     }
 
+
+    @Override
+public List<Transaction> findByAccountId(int accountId) {
+
+
+    List<Transaction> result = new ArrayList<>();
+
+
+    for(Transaction transaction : transactions){
+
+
+        if(transaction.getFromAccount() == accountId ||
+           transaction.getToAccount() == accountId){
+
+
+            result.add(transaction);
+
+        }
+
+    }
+
+
+    return result;
+
+}
+
 }

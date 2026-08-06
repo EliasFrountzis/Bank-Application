@@ -1,22 +1,21 @@
+
 package com.bank.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static spark.Spark.*;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 
 import com.bank.exception.ExceptionHandler;
 import com.bank.repository.AccountRepository;
 import com.bank.repository.InMemoryAccountRepository;
 import com.bank.repository.InMemoryTransactionRepository;
 import com.bank.repository.TransactionRepository;
-
 import com.bank.service.AccountService;
 import com.bank.service.TransactionService;
 import com.bank.service.TransferService;
-
 
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -24,23 +23,15 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 
 
-
-
-
-
 public class TransferControllerTest {
 
 
-    @BeforeAll
-static void setup(){
+    @BeforeEach
+    void setup() {
 
-   
+        port(4567);
 
-    ExceptionHandler.register();
-
-    
-
-
+        ExceptionHandler.register();
 
 
         AccountRepository accountRepository =
@@ -51,15 +42,12 @@ static void setup(){
                 new InMemoryTransactionRepository();
 
 
-
         AccountService accountService =
                 new AccountService(accountRepository);
 
 
-
         TransactionService transactionService =
                 new TransactionService(transactionRepository);
-
 
 
         TransferService transferService =
@@ -68,9 +56,6 @@ static void setup(){
                         transactionService
                 );
 
-
-
-        // Create test accounts
 
         accountService.createAccount(
                 "Alice",
@@ -84,79 +69,71 @@ static void setup(){
         );
 
 
-
         TransferController controller =
                 new TransferController(
                         transferService
                 );
 
 
-
-       
-
-
-        ExceptionHandler.register();
-
-
         controller.registerRoutes();
 
+
+        awaitInitialization();
     }
 
 
+    @AfterEach
+    void tearDown() {
+
+        stop();
+        awaitStop();
+    }
 
 
     @Test
-void shouldTransferMoneySuccessfully() throws Exception {
+    void shouldTransferMoneySuccessfully() throws Exception {
 
 
-    try(CloseableHttpClient client =
-            HttpClients.createDefault()){
+        try (CloseableHttpClient client =
+                     HttpClients.createDefault()) {
 
 
-        HttpPost request =
-                new HttpPost(
-                    "http://localhost:4567/transfer"
-                );
+            HttpPost request =
+                    new HttpPost(
+                            "http://localhost:4567/transfer"
+                    );
 
 
-        request.setHeader(
-                "Content-Type",
-                "application/json"
-        );
-
-
-
-        String json =
-                """
-                {
-                    "fromAccount":1,
-                    "toAccount":2,
-                    "amount":100
-                }
-                """;
-
-
-
-        request.setEntity(
-                new StringEntity(json)
-        );
-
-
-
-        client.execute(request, response -> {
-
-
-            assertEquals(
-                    200,
-                    response.getCode()
+            request.setHeader(
+                    "Content-Type",
+                    "application/json"
             );
 
 
-            return null;
-        });
+            String json =
+                    """
+                    {
+                        "fromAccount":1,
+                        "toAccount":2,
+                        "amount":100
+                    }
+                    """;
 
-    }
 
+            request.setEntity(
+                    new StringEntity(json)
+            );
+
+
+            client.execute(request, response -> {
+
+                assertEquals(
+                        200,
+                        response.getCode()
+                );
+
+                return null;
+            });
+        }
 }
-
 }

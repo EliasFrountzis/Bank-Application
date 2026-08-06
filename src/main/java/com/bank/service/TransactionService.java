@@ -43,4 +43,10 @@ public class TransactionService {
 
     }
 
+    public List<Transaction> getTransactionsByAccount(int accountId){
+
+    return transactionRepository.findByAccountId(accountId);
+
+}
+
 }

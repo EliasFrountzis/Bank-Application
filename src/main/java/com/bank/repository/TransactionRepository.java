@@ -12,5 +12,6 @@ public interface TransactionRepository {
 
 
     List<Transaction> findAll();
+    List<Transaction> findByAccountId(int accountId);
 
 }
