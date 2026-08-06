@@ -1,49 +1,76 @@
 package com.bank.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import com.bank.exception.BankException;
 import com.bank.model.Account;
+import com.bank.repository.AccountRepository;
+
 
 public class AccountService {
 
-    private final List<Account> accounts = new ArrayList<>();
+    private final AccountRepository accountRepository;
     private int nextId = 1;
 
-    public Account createAccount(String owner, double initialBalance) {
 
-    if (owner == null || owner.isBlank()) {
-        throw new IllegalArgumentException("Owner cannot be empty.");
+    public AccountService(AccountRepository accountRepository){
+        this.accountRepository = accountRepository;
     }
 
-    if (initialBalance < 0) {
-        throw new IllegalArgumentException("Initial balance cannot be negative.");
-    }
 
-    Account account = new Account(nextId++, owner, initialBalance);
+    public Account createAccount(String owner, double initialBalance){
 
-    accounts.add(account);
+      if (owner == null || owner.isBlank()) {
 
-    return account;
+    throw new BankException(
+            "Owner cannot be empty",
+            400
+    );
+
 }
 
-    public List<Account> getAccounts() {
-        return new ArrayList<>(accounts);
+
+if (initialBalance < 0) {
+
+    throw new BankException(
+            "Initial balance cannot be negative",
+            400
+    );
+
+}
+
+        Account account =
+            new Account(nextId++, owner, initialBalance);
+
+
+        return accountRepository.save(account);
     }
 
-    public Account getAccountById(int id) {
 
-    for (int i = 0; i < accounts.size(); i++) {
+    public List<Account> getAccounts(){
 
-        Account account = accounts.get(i);
-
-        if (account.getId() == id) {
-            return account;
-        }
+        return accountRepository.findAll();
 
     }
 
-    return null;
+
+   public Account getAccountById(int id) {
+
+    Account account = accountRepository.findById(id);
+
+
+    if(account == null){
+
+        throw new BankException(
+                "Account with id " + id + " not found",
+                404
+        );
+
+    }
+
+
+    return account;
+
 }
 
 }

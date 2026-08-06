@@ -8,20 +8,31 @@ public class ExceptionHandler {
 
     private static final Gson gson = new Gson();
 
+
     public static void register() {
 
-        exception(IllegalArgumentException.class, (exception, request, response) -> {
+
+        exception(BankException.class, (exception, request, response) -> {
+
 
             response.type("application/json");
-            response.status(400);
+
+
+            response.status(
+                    exception.getStatusCode()
+            );
+
 
             response.body(
                     gson.toJson(
-                            new ErrorResponse(exception.getMessage())
+                            new ErrorResponse(
+                                    exception.getMessage()
+                            )
                     )
             );
 
         });
+
 
     }
 

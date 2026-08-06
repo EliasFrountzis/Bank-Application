@@ -1,40 +1,45 @@
 package com.bank.service;
 
 import com.bank.model.Transaction;
+import com.bank.repository.TransactionRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionService {
 
-    private final List<Transaction> transactions = new ArrayList<>();
+
+    private final TransactionRepository transactionRepository;
 
     private int nextId = 1;
-
-
-    public Transaction createTransaction(
-            int fromAccount,
-            int toAccount,
-            double amount
-    ) {
-
-        Transaction transaction =
-                new Transaction(
-                        nextId++,
-                        fromAccount,
-                        toAccount,
-                        amount
-                );
-
-        transactions.add(transaction);
-
-        return transaction;
+    public TransactionService(
+            TransactionRepository transactionRepository
+    ){
+        this.transactionRepository = transactionRepository;
     }
 
 
-    public List<Transaction> getTransactions() {
+    public Transaction createTransaction(
+            int fromId,
+            int toId,
+            double amount
+    ){
 
-        return new ArrayList<>(transactions);
+        Transaction transaction =
+        new Transaction(
+                nextId++,
+                fromId,
+                toId,
+                amount
+        );
+
+
+        return transactionRepository.save(transaction);
+    }
+
+
+    public List<Transaction> getTransactions(){
+
+        return transactionRepository.findAll();
 
     }
 

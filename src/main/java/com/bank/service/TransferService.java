@@ -1,5 +1,6 @@
 package com.bank.service;
 
+import com.bank.exception.BankException;
 import com.bank.model.Account;
 
 public class TransferService {
@@ -26,20 +27,26 @@ public class TransferService {
         Account receiver = accountService.getAccountById(toId);
 
 
-        if (sender == null || receiver == null) {
-            throw new IllegalArgumentException("Account not found");
-        }
+    
+
+       if(amount <= 0){
+
+    throw new BankException(
+            "Transfer amount must be positive",
+            400
+    );
+
+}
 
 
-        if (amount <= 0) {
-            throw new IllegalArgumentException("Transfer amount must be positive");
-        }
+       if(sender.getBalance() < amount){
 
+    throw new BankException(
+            "Insufficient funds",
+            400
+    );
 
-        if (sender.getBalance() < amount) {
-            throw new IllegalArgumentException("Insufficient funds");
-        }
-
+}
 
         sender.withdraw(amount);
 

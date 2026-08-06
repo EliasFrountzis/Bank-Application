@@ -1,0 +1,5 @@
+com\bank\controller\TransferControllerTest.class
+com\bank\service\AccountServiceTest.class
+com\bank\controller\AccountControllerTest.class
+com\bank\service\TransactionServiceTest.class
+com\bank\service\TransferServiceTest.class

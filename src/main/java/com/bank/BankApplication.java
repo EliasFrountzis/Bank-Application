@@ -6,27 +6,42 @@ import com.bank.controller.AccountController;
 import com.bank.controller.TransferController;
 
 import com.bank.service.AccountService;
+import com.bank.repository.AccountRepository;
+import com.bank.repository.InMemoryAccountRepository;
+import com.bank.repository.InMemoryTransactionRepository;
+import com.bank.repository.TransactionRepository;
 import com.bank.service.TransferService;
 import com.bank.service.TransactionService;
 import com.bank.controller.TransactionController;
+import com.bank.exception.ExceptionHandler;
 
 
 public class BankApplication {
 
 
-    private static final AccountService accountService =
-            new AccountService();
+  private static final AccountRepository accountRepository =
+        new InMemoryAccountRepository();
 
 
-    private static final TransactionService transactionService =
-            new TransactionService();
+private static final AccountService accountService =
+        new AccountService(accountRepository);
 
 
-    private static final TransferService transferService =
-            new TransferService(
-                    accountService,
-                    transactionService
-            );
+
+private static final TransactionRepository transactionRepository =
+        new InMemoryTransactionRepository();
+
+
+private static final TransactionService transactionService =
+        new TransactionService(transactionRepository);
+
+
+
+private static final TransferService transferService =
+        new TransferService(
+                accountService,
+                transactionService
+        );
 
 
     private static final TransferController transferController =
@@ -44,6 +59,9 @@ public class BankApplication {
 
         port(4567);
 
+
+
+        ExceptionHandler.register();
 
         AccountController accountController =
                 new AccountController(accountService);

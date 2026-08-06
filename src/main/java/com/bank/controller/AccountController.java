@@ -57,20 +57,12 @@ public class AccountController {
 
     int id = Integer.parseInt(request.params(":id"));
 
-    Account account = accountService.getAccountById(id);
+    Account account =
+        accountService.getAccountById(id);
 
-    response.type("application/json");
+response.type("application/json");
 
-     if(account == null){
-
-        response.status(404);
-
-        return gson.toJson(
-                "Account not found"
-        );
-    }
-
-    return gson.toJson(account);
+return gson.toJson(account);
 
 });
 
