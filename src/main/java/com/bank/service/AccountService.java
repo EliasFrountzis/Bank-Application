@@ -10,7 +10,7 @@ import com.bank.repository.AccountRepository;
 public class AccountService {
 
     private final AccountRepository accountRepository;
-    private int nextId = 1;
+   
 
 
     public AccountService(AccountRepository accountRepository){
@@ -39,8 +39,12 @@ if (initialBalance < 0) {
 
 }
 
-        Account account =
-            new Account(nextId++, owner, initialBalance);
+       Account account =
+    new Account(
+        0,
+        owner,
+        initialBalance
+    );
 
 
         return accountRepository.save(account);
@@ -70,6 +74,12 @@ if (initialBalance < 0) {
 
 
     return account;
+
+}
+
+public void updateAccount(Account account){
+
+    accountRepository.update(account);
 
 }
 

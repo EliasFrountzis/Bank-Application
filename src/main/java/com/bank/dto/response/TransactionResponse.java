@@ -8,6 +8,7 @@ public class TransactionResponse {
     public int fromAccount;
     public int toAccount;
     public double amount;
+    public String timestamp;
 
 
     public TransactionResponse(Transaction transaction) {
@@ -16,6 +17,7 @@ public class TransactionResponse {
         this.fromAccount = transaction.getFromAccount();
         this.toAccount = transaction.getToAccount();
         this.amount = transaction.getAmount();
+        this.timestamp = transaction.getTimestamp();
 
     }
 

@@ -1,31 +1,64 @@
 package com.bank.database;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class DatabaseConnection {
 
 
-    private static final String URL =
-            "jdbc:postgresql://localhost:5432/bankdb";
+    private static final Properties properties = new Properties();
 
 
-    private static final String USER =
-            "postgres";
+    static {
+
+        try {
+
+            InputStream input =
+                    DatabaseConnection.class
+                            .getClassLoader()
+                            .getResourceAsStream(
+                                    "application.properties"
+                            );
 
 
-    private static final String PASSWORD =
-            "1234";
+            if(input == null){
+                throw new RuntimeException(
+                        "application.properties not found"
+                );
+            }
+
+
+            properties.load(input);
+
+
+        } catch(Exception e){
+
+            throw new RuntimeException(
+                    "Could not load database configuration",
+                    e
+            );
+
+        }
+
+    }
+
 
 
     public static Connection getConnection()
             throws SQLException {
 
+
         return DriverManager.getConnection(
-                URL,
-                USER,
-                PASSWORD
+
+                properties.getProperty("db.url"),
+
+                properties.getProperty("db.username"),
+
+                properties.getProperty("db.password")
+
         );
 
     }

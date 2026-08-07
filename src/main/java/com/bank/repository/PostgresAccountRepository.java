@@ -160,4 +160,28 @@ public class PostgresAccountRepository implements AccountRepository {
 
     }
 
+
+    @Override
+public void update(Account account) {
+
+    String sql =
+            "UPDATE accounts SET owner = ?, balance = ? WHERE id = ?";
+
+    try (Connection connection = DatabaseConnection.getConnection();
+         PreparedStatement statement =
+                 connection.prepareStatement(sql)) {
+
+        statement.setString(1, account.getOwner());
+        statement.setDouble(2, account.getBalance());
+        statement.setInt(3, account.getId());
+
+        statement.executeUpdate();
+
+    } catch (SQLException e) {
+
+        throw new RuntimeException(e);
+
+    }
+}
+
 }

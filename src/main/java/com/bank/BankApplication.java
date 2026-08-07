@@ -9,11 +9,14 @@ import com.bank.service.AccountService;
 import com.bank.repository.AccountRepository;
 import com.bank.repository.PostgresAccountRepository;
 import com.bank.repository.PostgresTransactionRepository;
+import com.bank.repository.PostgresTransferRepository;
 import com.bank.repository.TransactionRepository;
+import com.bank.repository.TransferRepository;
 import com.bank.service.TransferService;
 import com.bank.service.TransactionService;
 import com.bank.controller.TransactionController;
 import com.bank.exception.ExceptionHandler;
+
 
 
 public class BankApplication {
@@ -37,10 +40,14 @@ private static final TransactionService transactionService =
 
 
 
+private static final TransferRepository transferRepository =
+        new PostgresTransferRepository();
+
+
 private static final TransferService transferService =
         new TransferService(
                 accountService,
-                transactionService
+                transferRepository
         );
 
 

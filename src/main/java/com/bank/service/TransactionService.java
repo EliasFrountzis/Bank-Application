@@ -11,7 +11,7 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
 
-    private int nextId = 1;
+   
 
 
     public TransactionService(
@@ -49,7 +49,7 @@ public class TransactionService {
 
         Transaction transaction =
                 new Transaction(
-                        nextId++,
+                        0,
                         fromId,
                         toId,
                         amount

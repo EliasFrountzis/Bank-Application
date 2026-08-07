@@ -1,4 +1,3 @@
-
 package com.bank.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,12 +8,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.bank.exception.ExceptionHandler;
+import com.bank.model.Account;
 import com.bank.repository.AccountRepository;
 import com.bank.repository.InMemoryAccountRepository;
-import com.bank.repository.InMemoryTransactionRepository;
-import com.bank.repository.TransactionRepository;
+import com.bank.repository.InMemoryTransferRepository;
+import com.bank.repository.TransferRepository;
 import com.bank.service.AccountService;
-import com.bank.service.TransactionService;
 import com.bank.service.TransferService;
 
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -27,59 +26,68 @@ public class TransferControllerTest {
 
 
     @BeforeEach
-    void setup() {
-
-        port(4567);
-
-        ExceptionHandler.register();
+void setup() {
 
 
-        AccountRepository accountRepository =
-                new InMemoryAccountRepository();
+    port(4567);
+
+    ExceptionHandler.register();
 
 
-        TransactionRepository transactionRepository =
-                new InMemoryTransactionRepository();
+    AccountRepository accountRepository =
+            new InMemoryAccountRepository();
 
 
-        AccountService accountService =
-                new AccountService(accountRepository);
+    AccountService accountService =
+            new AccountService(
+                    accountRepository
+            );
 
 
-        TransactionService transactionService =
-                new TransactionService(transactionRepository);
+    InMemoryTransferRepository transferRepository =
+            new InMemoryTransferRepository();
 
 
-        TransferService transferService =
-                new TransferService(
-                        accountService,
-                        transactionService
-                );
+
+    TransferService transferService =
+            new TransferService(
+                    accountService,
+                    transferRepository
+            );
 
 
-        accountService.createAccount(
-                "Alice",
-                1000
-        );
+
+    Account alice =
+            accountService.createAccount(
+                    "Alice",
+                    1000
+            );
 
 
-        accountService.createAccount(
-                "Bob",
-                500
-        );
+    Account bob =
+            accountService.createAccount(
+                    "Bob",
+                    500
+            );
 
 
-        TransferController controller =
-                new TransferController(
-                        transferService
-                );
+    transferRepository.addAccount(alice);
+    transferRepository.addAccount(bob);
 
 
-        controller.registerRoutes();
+
+    TransferController controller =
+            new TransferController(
+                    transferService
+            );
 
 
-        awaitInitialization();
-    }
+    controller.registerRoutes();
+
+
+    awaitInitialization();
+
+}
 
 
     @AfterEach
@@ -87,7 +95,9 @@ public class TransferControllerTest {
 
         stop();
         awaitStop();
+
     }
+
 
 
     @Test
@@ -127,13 +137,19 @@ public class TransferControllerTest {
 
             client.execute(request, response -> {
 
+
                 assertEquals(
                         200,
                         response.getCode()
                 );
 
+
                 return null;
+
             });
+
         }
-}
+
+    }
+
 }
