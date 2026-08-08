@@ -1,7 +1,5 @@
 package com.bank.model;
 
-
-
 public class Transaction {
 
     private int id;
@@ -10,15 +8,38 @@ public class Transaction {
     private double amount;
     private String timestamp;
 
-   public Transaction(int id, int fromAccount, int toAccount, double amount) {
 
-    this.id = id;
-    this.fromAccount = fromAccount;
-    this.toAccount = toAccount;
-    this.amount = amount;
-    this.timestamp = java.time.LocalDateTime.now().toString();
+    public Transaction(
+            int id,
+            int fromAccount,
+            int toAccount,
+            double amount
+    ) {
 
-}
+        this.id = id;
+        this.fromAccount = fromAccount;
+        this.toAccount = toAccount;
+        this.amount = amount;
+        this.timestamp =
+                java.time.LocalDateTime.now().toString();
+    }
+
+
+    public Transaction(
+            int id,
+            int fromAccount,
+            int toAccount,
+            double amount,
+            String timestamp
+    ) {
+
+        this.id = id;
+        this.fromAccount = fromAccount;
+        this.toAccount = toAccount;
+        this.amount = amount;
+        this.timestamp = timestamp;
+    }
+
 
     public int getId() {
         return id;
@@ -41,7 +62,7 @@ public class Transaction {
 
 
     public String getTimestamp() {
-    return timestamp;
+        return timestamp;
+    }
 }
 
-}

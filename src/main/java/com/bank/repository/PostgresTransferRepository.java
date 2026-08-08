@@ -2,12 +2,17 @@ package com.bank.repository;
 
 import com.bank.database.DatabaseConnection;
 import com.bank.exception.BankException;
+import com.bank.jooq.tables.records.AccountsRecord;
 
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
+
+import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
+
+import static com.bank.jooq.tables.Accounts.ACCOUNTS;
+import static com.bank.jooq.tables.Transactions.TRANSACTIONS;
 
 public class PostgresTransferRepository implements TransferRepository {
 
@@ -18,43 +23,18 @@ public class PostgresTransferRepository implements TransferRepository {
             double amount
     ) {
 
-        String lockSql =
-                """
-                SELECT id, balance
-                FROM accounts
-                WHERE id = ?
-                FOR UPDATE
-                """;
-
-        String withdrawSql =
-                """
-                UPDATE accounts
-                SET balance = balance - ?
-                WHERE id = ?
-                """;
-
-        String depositSql =
-                """
-                UPDATE accounts
-                SET balance = balance + ?
-                WHERE id = ?
-                """;
-
-        String transactionSql =
-                """
-                INSERT INTO transactions
-                (from_account, to_account, amount, timestamp)
-                VALUES (?, ?, ?, ?)
-                """;
-
-        try (Connection connection = DatabaseConnection.getConnection()) {
+        try (Connection connection =
+                     DatabaseConnection.getConnection()) {
 
             connection.setAutoCommit(false);
 
             try {
 
+                DSLContext dsl = DSL.using(connection);
+
                 /*
                  * Lock both accounts in a consistent order.
+                 *
                  * This prevents two opposite transfers from
                  * acquiring the locks in different orders.
                  */
@@ -63,44 +43,48 @@ public class PostgresTransferRepository implements TransferRepository {
 
                 double senderBalance = 0;
 
-                try (PreparedStatement statement =
-                             connection.prepareStatement(lockSql)) {
+                /*
+                 * Lock the first account.
+                 */
+                AccountsRecord firstRecord =
+                        dsl.selectFrom(ACCOUNTS)
+                                .where(ACCOUNTS.ID.eq(firstLock))
+                                .forUpdate()
+                                .fetchOne();
 
-                    statement.setInt(1, firstLock);
+                if (firstRecord == null) {
 
-                    try (ResultSet result = statement.executeQuery()) {
-
-                        if (!result.next()) {
-                            throw new BankException(
-                                    "Account with id " + firstLock + " not found",
-                                    404
-                            );
-                        }
-
-                        if (firstLock == fromAccount) {
-                            senderBalance = result.getDouble("balance");
-                        }
-                    }
+                    throw new BankException(
+                            "Account with id " + firstLock + " not found",
+                            404
+                    );
                 }
 
-                try (PreparedStatement statement =
-                             connection.prepareStatement(lockSql)) {
+                if (firstLock == fromAccount) {
+                    senderBalance =
+                            firstRecord.get(ACCOUNTS.BALANCE).doubleValue();
+                }
 
-                    statement.setInt(1, secondLock);
+                /*
+                 * Lock the second account.
+                 */
+                AccountsRecord secondRecord =
+                        dsl.selectFrom(ACCOUNTS)
+                                .where(ACCOUNTS.ID.eq(secondLock))
+                                .forUpdate()
+                                .fetchOne();
 
-                    try (ResultSet result = statement.executeQuery()) {
+                if (secondRecord == null) {
 
-                        if (!result.next()) {
-                            throw new BankException(
-                                    "Account with id " + secondLock + " not found",
-                                    404
-                            );
-                        }
+                    throw new BankException(
+                            "Account with id " + secondLock + " not found",
+                            404
+                    );
+                }
 
-                        if (secondLock == fromAccount) {
-                            senderBalance = result.getDouble("balance");
-                        }
-                    }
+                if (secondLock == fromAccount) {
+                    senderBalance =
+                            secondRecord.get(ACCOUNTS.BALANCE).doubleValue();
                 }
 
                 /*
@@ -118,43 +102,70 @@ public class PostgresTransferRepository implements TransferRepository {
                     );
                 }
 
-                try (PreparedStatement withdraw =
-                             connection.prepareStatement(withdrawSql)) {
+                /*
+                 * Withdraw from sender.
+                 */
+                dsl.update(ACCOUNTS)
+                        .set(
+                                ACCOUNTS.BALANCE,
+                                ACCOUNTS.BALANCE.subtract(
+                                        BigDecimal.valueOf(amount)
+                                )
+                        )
+                        .where(ACCOUNTS.ID.eq(fromAccount))
+                        .execute();
 
-                    withdraw.setDouble(1, amount);
-                    withdraw.setInt(2, fromAccount);
+                /*
+                 * Deposit into receiver.
+                 */
+                dsl.update(ACCOUNTS)
+                        .set(
+                                ACCOUNTS.BALANCE,
+                                ACCOUNTS.BALANCE.add(
+                                        BigDecimal.valueOf(amount)
+                                )
+                        )
+                        .where(ACCOUNTS.ID.eq(toAccount))
+                        .execute();
 
-                    withdraw.executeUpdate();
-                }
+                /*
+                 * Record the transaction.
+                 */
+                dsl.insertInto(TRANSACTIONS)
+                        .set(
+                                TRANSACTIONS.FROM_ACCOUNT,
+                                fromAccount
+                        )
+                        .set(
+                                TRANSACTIONS.TO_ACCOUNT,
+                                toAccount
+                        )
+                        .set(
+                                TRANSACTIONS.AMOUNT,
+                                BigDecimal.valueOf(amount)
+                        )
+                        .set(
+                                TRANSACTIONS.TIMESTAMP,
+                                LocalDateTime.now()
+                        )
+                        .execute();
 
-                try (PreparedStatement deposit =
-                             connection.prepareStatement(depositSql)) {
-
-                    deposit.setDouble(1, amount);
-                    deposit.setInt(2, toAccount);
-
-                    deposit.executeUpdate();
-                }
-
-                try (PreparedStatement transaction =
-                             connection.prepareStatement(transactionSql)) {
-
-                    transaction.setInt(1, fromAccount);
-                    transaction.setInt(2, toAccount);
-                    transaction.setDouble(3, amount);
-                    transaction.setTimestamp(
-                            4,
-                            Timestamp.valueOf(LocalDateTime.now())
-                    );
-
-                    transaction.executeUpdate();
-                }
-
+                /*
+                 * Everything succeeded.
+                 */
                 connection.commit();
 
             } catch (Exception e) {
 
+                /*
+                 * Any failure rolls back the entire transfer:
+                 *
+                 * - account withdrawal
+                 * - account deposit
+                 * - transaction record
+                 */
                 connection.rollback();
+
                 throw e;
             }
 
@@ -171,3 +182,4 @@ public class PostgresTransferRepository implements TransferRepository {
         }
     }
 }
+
