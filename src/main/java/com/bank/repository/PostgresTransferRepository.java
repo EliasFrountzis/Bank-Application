@@ -1,16 +1,15 @@
 package com.bank.repository;
 
 import com.bank.database.DatabaseConnection;
+import com.bank.exception.BankException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-
-public class PostgresTransferRepository
-        implements TransferRepository {
-
+public class PostgresTransferRepository implements TransferRepository {
 
     @Override
     public void transfer(
@@ -19,6 +18,13 @@ public class PostgresTransferRepository
             double amount
     ) {
 
+        String lockSql =
+                """
+                SELECT id, balance
+                FROM accounts
+                WHERE id = ?
+                FOR UPDATE
+                """;
 
         String withdrawSql =
                 """
@@ -27,14 +33,12 @@ public class PostgresTransferRepository
                 WHERE id = ?
                 """;
 
-
         String depositSql =
                 """
                 UPDATE accounts
                 SET balance = balance + ?
                 WHERE id = ?
                 """;
-
 
         String transactionSql =
                 """
@@ -43,78 +47,127 @@ public class PostgresTransferRepository
                 VALUES (?, ?, ?, ?)
                 """;
 
-
-        try(Connection connection =
-                DatabaseConnection.getConnection()) {
-
+        try (Connection connection = DatabaseConnection.getConnection()) {
 
             connection.setAutoCommit(false);
 
-
             try {
 
+                /*
+                 * Lock both accounts in a consistent order.
+                 * This prevents two opposite transfers from
+                 * acquiring the locks in different orders.
+                 */
+                int firstLock = Math.min(fromAccount, toAccount);
+                int secondLock = Math.max(fromAccount, toAccount);
 
-                PreparedStatement withdraw =
-                        connection.prepareStatement(withdrawSql);
+                double senderBalance = 0;
 
-                withdraw.setDouble(1, amount);
-                withdraw.setInt(2, fromAccount);
+                try (PreparedStatement statement =
+                             connection.prepareStatement(lockSql)) {
 
-                withdraw.executeUpdate();
+                    statement.setInt(1, firstLock);
 
+                    try (ResultSet result = statement.executeQuery()) {
 
+                        if (!result.next()) {
+                            throw new BankException(
+                                    "Account with id " + firstLock + " not found",
+                                    404
+                            );
+                        }
 
-                PreparedStatement deposit =
-                        connection.prepareStatement(depositSql);
+                        if (firstLock == fromAccount) {
+                            senderBalance = result.getDouble("balance");
+                        }
+                    }
+                }
 
-                deposit.setDouble(1, amount);
-                deposit.setInt(2, toAccount);
+                try (PreparedStatement statement =
+                             connection.prepareStatement(lockSql)) {
 
-                deposit.executeUpdate();
+                    statement.setInt(1, secondLock);
 
+                    try (ResultSet result = statement.executeQuery()) {
 
+                        if (!result.next()) {
+                            throw new BankException(
+                                    "Account with id " + secondLock + " not found",
+                                    404
+                            );
+                        }
 
-                PreparedStatement transaction =
-                        connection.prepareStatement(transactionSql);
+                        if (secondLock == fromAccount) {
+                            senderBalance = result.getDouble("balance");
+                        }
+                    }
+                }
 
-                transaction.setInt(1, fromAccount);
-                transaction.setInt(2, toAccount);
-                transaction.setDouble(3, amount);
+                /*
+                 * The balance check happens AFTER the sender row
+                 * has been locked.
+                 *
+                 * Therefore another concurrent transfer cannot
+                 * change this balance while we are using it.
+                 */
+                if (senderBalance < amount) {
 
-                transaction.setTimestamp(
-                        4,
-                        Timestamp.valueOf(
-                                LocalDateTime.now()
-                        )
-                );
+                    throw new BankException(
+                            "Insufficient funds",
+                            400
+                    );
+                }
 
-                transaction.executeUpdate();
+                try (PreparedStatement withdraw =
+                             connection.prepareStatement(withdrawSql)) {
 
+                    withdraw.setDouble(1, amount);
+                    withdraw.setInt(2, fromAccount);
 
+                    withdraw.executeUpdate();
+                }
+
+                try (PreparedStatement deposit =
+                             connection.prepareStatement(depositSql)) {
+
+                    deposit.setDouble(1, amount);
+                    deposit.setInt(2, toAccount);
+
+                    deposit.executeUpdate();
+                }
+
+                try (PreparedStatement transaction =
+                             connection.prepareStatement(transactionSql)) {
+
+                    transaction.setInt(1, fromAccount);
+                    transaction.setInt(2, toAccount);
+                    transaction.setDouble(3, amount);
+                    transaction.setTimestamp(
+                            4,
+                            Timestamp.valueOf(LocalDateTime.now())
+                    );
+
+                    transaction.executeUpdate();
+                }
 
                 connection.commit();
 
-
-            } catch(Exception e){
+            } catch (Exception e) {
 
                 connection.rollback();
-
                 throw e;
-
             }
 
+        } catch (BankException e) {
 
-        } catch(Exception e){
+            throw e;
+
+        } catch (Exception e) {
 
             throw new RuntimeException(
                     "Transfer failed",
                     e
             );
-
         }
-
-
     }
-
-
 }

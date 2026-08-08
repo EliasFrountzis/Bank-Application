@@ -51,15 +51,26 @@ public class DatabaseConnection {
             throws SQLException {
 
 
-        return DriverManager.getConnection(
+        String url = System.getProperty(
+        "db.url",
+        properties.getProperty("db.url")
+);
 
-                properties.getProperty("db.url"),
+String username = System.getProperty(
+        "db.username",
+        properties.getProperty("db.username")
+);
 
-                properties.getProperty("db.username"),
+String password = System.getProperty(
+        "db.password",
+        properties.getProperty("db.password")
+);
 
-                properties.getProperty("db.password")
-
-        );
+return DriverManager.getConnection(
+        url,
+        username,
+        password
+);
 
     }
 

@@ -1,6 +1,9 @@
 C:\Users\ilias\OneDrive\Desktop\ProjectBank\bank-backend\src\test\java\com\bank\controller\AccountControllerTest.java
 C:\Users\ilias\OneDrive\Desktop\ProjectBank\bank-backend\src\test\java\com\bank\controller\TransactionControllerTest.java
 C:\Users\ilias\OneDrive\Desktop\ProjectBank\bank-backend\src\test\java\com\bank\controller\TransferControllerTest.java
+C:\Users\ilias\OneDrive\Desktop\ProjectBank\bank-backend\src\test\java\com\bank\database\PostgresIntegrationTest.java
+C:\Users\ilias\OneDrive\Desktop\ProjectBank\bank-backend\src\test\java\com\bank\repository\PostgresAccountRepositoryTest.java
+C:\Users\ilias\OneDrive\Desktop\ProjectBank\bank-backend\src\test\java\com\bank\repository\PostgresTransferRepositoryTest.java
 C:\Users\ilias\OneDrive\Desktop\ProjectBank\bank-backend\src\test\java\com\bank\service\AccountServiceTest.java
 C:\Users\ilias\OneDrive\Desktop\ProjectBank\bank-backend\src\test\java\com\bank\service\TransactionServiceTest.java
 C:\Users\ilias\OneDrive\Desktop\ProjectBank\bank-backend\src\test\java\com\bank\service\TransferServiceTest.java

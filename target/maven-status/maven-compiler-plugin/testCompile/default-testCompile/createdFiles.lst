@@ -1,6 +1,9 @@
+com\bank\database\PostgresIntegrationTest.class
+com\bank\repository\PostgresTransferRepositoryTest.class
+com\bank\controller\AccountControllerTest.class
+com\bank\service\TransactionServiceTest.class
+com\bank\repository\PostgresAccountRepositoryTest.class
 com\bank\controller\TransactionControllerTest.class
 com\bank\controller\TransferControllerTest.class
 com\bank\service\AccountServiceTest.class
-com\bank\controller\AccountControllerTest.class
-com\bank\service\TransactionServiceTest.class
 com\bank\service\TransferServiceTest.class
