@@ -8,35 +8,35 @@ I built this project to get more practical experience with Java backend developm
 
 ## Features
 
-    * Create bank accounts
-    * View all accounts
-    * View an account by ID
-    * Transfer money between accounts
-    * Validate account creation and transfers
-    * Prevent transfers with insufficient funds
-    * Prevent transfers between the same account
-    * Store transaction history
-    * View all transactions
-    * View transactions for a specific account
-    * PostgreSQL persistence
-    * Atomic money transfers with rollback
-    * Row-level locking for concurrent transfers
-    * Unit, controller, and PostgreSQL integration tests
-    * jOOQ-generated database classes
+    1. Create bank accounts
+    2. View all accounts
+    3. View an account by ID
+    4. Transfer money between accounts
+    5. Validate account creation and transfers
+    6. Prevent transfers with insufficient funds
+    7. Prevent transfers between the same account
+    8. Store transaction history
+    9. View all transactions
+    10. View transactions for a specific account
+    11. PostgreSQL persistence
+    12. Atomic money transfers with rollback
+    13. Row-level locking for concurrent transfers
+    14. Unit, controller, and PostgreSQL integration tests
+    15. jOOQ-generated database classes
 
 
 
 ## Technologies
 
-    * **Java 21**
-    * **Maven** – project and dependency management
-    * **SparkJava** – HTTP/REST API
-    * **Gson** – JSON handling
-    * **PostgreSQL** – database
-    * **jOOQ** – type-safe SQL and database code generation
-    * **JUnit 5** – testing
-    * **Testcontainers** – PostgreSQL integration testing
-    * **Docker** – running PostgreSQL locally
+    1. Java 21
+    2. Maven – project and dependency management
+    3. SparkJava – HTTP/REST API
+    4. Gson – JSON handling
+    5. PostgreSQL – database
+    6. jOOQ – type-safe SQL and database code generation
+    7. JUnit 5 – testing
+    8. Testcontainers – PostgreSQL integration testing
+    9. Docker – running PostgreSQL locally
 
 
 
@@ -46,9 +46,9 @@ I built this project to get more practical experience with Java backend developm
 
 You will need:
 
-* Java 21
-* Maven
-* Docker Desktop
+1. Java 21
+2. Maven
+3. Docker Desktop
 
 PostgreSQL is run through Docker
 
@@ -154,11 +154,11 @@ The application uses a custom `BankException` for business-related errors.
 
 Some examples are:
 
-* Invalid account information
-* Account not found
-* Invalid transfer amount
-* Insufficient funds
-* Attempting to transfer money to the same account
+1. Invalid account information
+2. Account not found
+3. Invalid transfer amount
+4. Insufficient funds
+5. Attempting to transfer money to the same account
 
 The `ExceptionHandler` converts these exceptions into HTTP responses.
 
