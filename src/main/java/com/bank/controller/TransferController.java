@@ -19,7 +19,7 @@ public class TransferController {
 
     public void registerRoutes() {
 
-       post("/transfer", (request, response) -> {
+       post("/transfers", (request, response) -> {
 
     try {
 
@@ -27,11 +27,12 @@ public class TransferController {
                 gson.fromJson(request.body(), TransferRequest.class);
 
 
-        transferService.transfer(
-                transferRequest.fromAccount,
-                transferRequest.toAccount,
-                transferRequest.amount
-        );
+       transferService.transfer(
+        transferRequest.fromAccount,
+        transferRequest.toAccount,
+        transferRequest.amount,
+        transferRequest.description
+);
 
 
        response.status(200);

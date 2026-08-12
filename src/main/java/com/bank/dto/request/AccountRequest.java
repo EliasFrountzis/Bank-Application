@@ -2,7 +2,8 @@ package com.bank.dto.request;
 
 public class AccountRequest {
 
-    public String owner;
+    public int userId;
     public double balance;
+    public String cardLast4;
 
 }

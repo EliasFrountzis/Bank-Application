@@ -36,59 +36,101 @@ public class TransactionsRecord extends UpdatableRecordImpl<TransactionsRecord> 
     }
 
     /**
+     * Setter for <code>public.transactions.account_id</code>.
+     */
+    public void setAccountId(Integer value) {
+        set(1, value);
+    }
+
+    /**
+     * Getter for <code>public.transactions.account_id</code>.
+     */
+    public Integer getAccountId() {
+        return (Integer) get(1);
+    }
+
+    /**
+     * Setter for <code>public.transactions.type</code>.
+     */
+    public void setType(String value) {
+        set(2, value);
+    }
+
+    /**
+     * Getter for <code>public.transactions.type</code>.
+     */
+    public String getType() {
+        return (String) get(2);
+    }
+
+    /**
      * Setter for <code>public.transactions.from_account</code>.
      */
     public void setFromAccount(Integer value) {
-        set(1, value);
+        set(3, value);
     }
 
     /**
      * Getter for <code>public.transactions.from_account</code>.
      */
     public Integer getFromAccount() {
-        return (Integer) get(1);
+        return (Integer) get(3);
     }
 
     /**
      * Setter for <code>public.transactions.to_account</code>.
      */
     public void setToAccount(Integer value) {
-        set(2, value);
+        set(4, value);
     }
 
     /**
      * Getter for <code>public.transactions.to_account</code>.
      */
     public Integer getToAccount() {
-        return (Integer) get(2);
+        return (Integer) get(4);
     }
 
     /**
      * Setter for <code>public.transactions.amount</code>.
      */
     public void setAmount(BigDecimal value) {
-        set(3, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>public.transactions.amount</code>.
      */
     public BigDecimal getAmount() {
-        return (BigDecimal) get(3);
+        return (BigDecimal) get(5);
+    }
+
+    /**
+     * Setter for <code>public.transactions.description</code>.
+     */
+    public void setDescription(String value) {
+        set(6, value);
+    }
+
+    /**
+     * Getter for <code>public.transactions.description</code>.
+     */
+    public String getDescription() {
+        return (String) get(6);
     }
 
     /**
      * Setter for <code>public.transactions.timestamp</code>.
      */
     public void setTimestamp(LocalDateTime value) {
-        set(4, value);
+        set(7, value);
     }
 
     /**
      * Getter for <code>public.transactions.timestamp</code>.
      */
     public LocalDateTime getTimestamp() {
-        return (LocalDateTime) get(4);
+        return (LocalDateTime) get(7);
     }
 
     // -------------------------------------------------------------------------
@@ -114,13 +156,16 @@ public class TransactionsRecord extends UpdatableRecordImpl<TransactionsRecord> 
     /**
      * Create a detached, initialised TransactionsRecord
      */
-    public TransactionsRecord(Integer id, Integer fromAccount, Integer toAccount, BigDecimal amount, LocalDateTime timestamp) {
+    public TransactionsRecord(Integer id, Integer accountId, String type, Integer fromAccount, Integer toAccount, BigDecimal amount, String description, LocalDateTime timestamp) {
         super(Transactions.TRANSACTIONS);
 
         setId(id);
+        setAccountId(accountId);
+        setType(type);
         setFromAccount(fromAccount);
         setToAccount(toAccount);
         setAmount(amount);
+        setDescription(description);
         setTimestamp(timestamp);
         resetTouchedOnNotNull();
     }

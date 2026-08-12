@@ -7,6 +7,7 @@ import com.bank.dto.request.AccountRequest;
 import com.bank.dto.response.AccountResponse;
 import com.bank.model.Account;
 import com.google.gson.Gson;
+
 import java.util.List;
 
 public class AccountController {
@@ -14,70 +15,126 @@ public class AccountController {
     private final AccountService accountService;
     private final Gson gson = new Gson();
 
-
     public AccountController(AccountService accountService) {
         this.accountService = accountService;
     }
 
-
     public void registerRoutes() {
 
-
+        // CREATE ACCOUNT
         post("/accounts", (request, response) -> {
 
             AccountRequest accountRequest =
-                    gson.fromJson(request.body(), AccountRequest.class);
-
+                    gson.fromJson(
+                            request.body(),
+                            AccountRequest.class
+                    );
 
             Account account =
                     accountService.createAccount(
-                            accountRequest.owner,
-                            accountRequest.balance
+                            accountRequest.userId,
+                            accountRequest.balance,
+                            accountRequest.cardLast4
                     );
 
-                      response.status(201);
+            response.status(201);
+            response.type("application/json");
 
+            return gson.toJson(
+                    new AccountResponse(account)
+            );
+        });
+
+
+        // GET ALL ACCOUNTS
+        get("/accounts", (request, response) -> {
+
+            response.type("application/json");
+
+            List<AccountResponse> responses =
+                    accountService.getAccounts()
+                            .stream()
+                            .map(AccountResponse::new)
+                            .toList();
+
+            return gson.toJson(responses);
+        });
+
+
+        // GET ACCOUNT BY ID
+        get("/accounts/:id", (request, response) -> {
+
+            int id =
+                    Integer.parseInt(
+                            request.params(":id")
+                    );
+
+            Account account =
+                    accountService.getAccountById(id);
 
             response.type("application/json");
 
             return gson.toJson(
-    new AccountResponse(account)
-);
-
+                    new AccountResponse(account)
+            );
         });
 
 
+        // DEPOSIT
+        post("/accounts/:id/deposit", (request, response) -> {
 
-        get("/accounts", (request, response) -> {
+            int accountId =
+                    Integer.parseInt(
+                            request.params(":id")
+                    );
 
-    response.type("application/json");
+            double amount =
+                    Double.parseDouble(
+                            request.body()
+                    );
 
-    List<AccountResponse> responses =
-            accountService.getAccounts()
-                    .stream()
-                    .map(AccountResponse::new)
-                    .toList();
+            Account account =
+                    accountService.deposit(
+                            accountId,
+                            amount
+                    );
 
-    return gson.toJson(responses);
+            response.status(200);
+            response.type("application/json");
 
-});
+            return gson.toJson(
+                    new AccountResponse(account)
+            );
+        });
 
 
-        get("/accounts/:id", (request, response) -> {
+        // WITHDRAW
+        post("/accounts/:id/withdraw", (request, response) -> {
 
-    int id = Integer.parseInt(request.params(":id"));
+            int accountId =
+                    Integer.parseInt(
+                            request.params(":id")
+                    );
 
-    Account account =
-        accountService.getAccountById(id);
+            double amount =
+                    Double.parseDouble(
+                            request.body()
+                    );
 
-response.type("application/json");
+            Account account =
+                    accountService.withdraw(
+                            accountId,
+                            amount
+                    );
 
-return gson.toJson(
-    new AccountResponse(account)
-);
+            response.status(200);
+            response.type("application/json");
 
-});
+            return gson.toJson(
+                    new AccountResponse(account)
+            );
+        });
 
     }
-
 }
+

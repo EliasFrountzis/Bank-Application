@@ -15,51 +15,58 @@ public class PostgresAccountRepositoryTest extends PostgresIntegrationTest {
     private PostgresAccountRepository repository;
 
     @BeforeEach
-    void setUp() throws Exception {
+void setUp() throws Exception {
 
-        repository = new PostgresAccountRepository();
+    repository = new PostgresAccountRepository();
 
-        try (Connection connection = postgres.createConnection("");
-             Statement statement = connection.createStatement()) {
+    try (Connection connection = postgres.createConnection("");
+         Statement statement = connection.createStatement()) {
 
-            statement.executeUpdate("DELETE FROM transactions");
-            statement.executeUpdate("DELETE FROM accounts");
-        }
+        statement.executeUpdate("DELETE FROM transactions");
+        statement.executeUpdate("DELETE FROM accounts");
+        statement.executeUpdate("DELETE FROM users");
+
+        statement.executeUpdate(
+                "INSERT INTO users (id, name, email, password_hash) VALUES " +
+                "(1, 'Ilias', 'ilias@test.com', 'test-hash-1'), " +
+                "(2, 'John', 'john@test.com', 'test-hash-2')"
+        );
     }
+}
 
     @Test
     void shouldSaveAndFindAccount() {
 
-        Account account = new Account(
-                0,
-                "Ilias",
-                1000.00
-        );
+        Account account =
+                new Account(0, 1, 1000.00, "1234");
 
         Account saved = repository.save(account);
 
         assertNotNull(saved);
         assertTrue(saved.getId() > 0);
-        assertEquals("Ilias", saved.getOwner());
+        assertEquals(1, saved.getUserId());
         assertEquals(1000.00, saved.getBalance());
+        assertEquals("1234", saved.getCardLast4());
 
-        Account found = repository.findById(saved.getId());
+        Account found =
+                repository.findById(saved.getId());
 
         assertNotNull(found);
         assertEquals(saved.getId(), found.getId());
-        assertEquals("Ilias", found.getOwner());
+        assertEquals(1, found.getUserId());
         assertEquals(1000.00, found.getBalance());
+        assertEquals("1234", found.getCardLast4());
     }
 
     @Test
     void shouldFindAllAccounts() {
 
         repository.save(
-                new Account(0, "Ilias", 1000.00)
+                new Account(0, 1, 1000.00, "1234")
         );
 
         repository.save(
-                new Account(0, "John", 500.00)
+                new Account(0, 2, 500.00, "5678")
         );
 
         var accounts = repository.findAll();
@@ -70,22 +77,28 @@ public class PostgresAccountRepositoryTest extends PostgresIntegrationTest {
     @Test
     void shouldUpdateAccount() {
 
-        Account saved = repository.save(
-                new Account(0, "Ilias", 1000.00)
-        );
+        Account saved =
+                repository.save(
+                        new Account(0, 1, 1000.00, "1234")
+                );
 
-        Account updated = new Account(
-                saved.getId(),
-                "Ilias Updated",
-                2000.00
-        );
+        Account updated =
+                new Account(
+                        saved.getId(),
+                        1,
+                        2000.00,
+                        "9999"
+                );
 
         repository.update(updated);
 
-        Account found = repository.findById(saved.getId());
+        Account found =
+                repository.findById(saved.getId());
 
         assertNotNull(found);
-        assertEquals("Ilias Updated", found.getOwner());
+        assertEquals(1, found.getUserId());
         assertEquals(2000.00, found.getBalance());
+        assertEquals("9999", found.getCardLast4());
     }
 }
+

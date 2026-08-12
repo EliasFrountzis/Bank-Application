@@ -9,12 +9,9 @@ import com.bank.model.Transaction;
 import com.bank.repository.TransactionRepository;
 import com.bank.repository.InMemoryTransactionRepository;
 
-
 public class TransactionServiceTest {
 
-
     private TransactionService transactionService;
-
 
     @BeforeEach
     void setup() {
@@ -22,89 +19,81 @@ public class TransactionServiceTest {
         TransactionRepository repository =
                 new InMemoryTransactionRepository();
 
-
         transactionService =
                 new TransactionService(repository);
-
     }
 
+    @Test
+    void shouldCreateTransaction() {
 
+        Transaction transaction =
+                transactionService.createTransaction(
+                        1,
+                        2,
+                        200,
+                        "Groceries"
+                );
 
+        assertEquals(
+                1,
+                transaction.getFromAccount()
+        );
 
+        assertEquals(
+                2,
+                transaction.getToAccount()
+        );
+
+        assertEquals(
+                200,
+                transaction.getAmount()
+        );
+
+        assertEquals(
+                "Groceries",
+                transaction.getDescription()
+        );
+    }
 
     @Test
-void shouldCreateTransaction() {
+    void shouldReturnAllTransactions() {
 
+        transactionService.createTransaction(
+                1,
+                2,
+                200,
+                "Groceries"
+        );
 
-    Transaction transaction =
-            transactionService.createTransaction(
-                    1,
-                    2,
-                    200
-            );
+        transactionService.createTransaction(
+                2,
+                3,
+                50,
+                "Dinner"
+        );
 
+        assertEquals(
+                2,
+                transactionService
+                        .getTransactions()
+                        .size()
+        );
 
-    assertEquals(
-            1,
-            transaction.getFromAccount()
-    );
+        assertEquals(
+                200,
+                transactionService
+                        .getTransactions()
+                        .get(0)
+                        .getAmount()
+        );
 
-
-    assertEquals(
-            2,
-            transaction.getToAccount()
-    );
-
-
-    assertEquals(
-            200,
-            transaction.getAmount()
-    );
-
+        assertEquals(
+                50,
+                transactionService
+                        .getTransactions()
+                        .get(1)
+                        .getAmount()
+        );
+    }
 }
 
-
-@Test
-void shouldReturnAllTransactions() {
-
-
-    transactionService.createTransaction(
-            1,
-            2,
-            200
-    );
-
-
-    transactionService.createTransaction(
-            2,
-            3,
-            50
-    );
-
-
-    assertEquals(
-            2,
-            transactionService.getTransactions().size()
-    );
-
-
-    assertEquals(
-            200,
-            transactionService
-                    .getTransactions()
-                    .get(0)
-                    .getAmount()
-    );
-
-
-    assertEquals(
-            50,
-            transactionService
-                    .getTransactions()
-                    .get(1)
-                    .getAmount()
-    );
-
-}
-
-}

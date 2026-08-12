@@ -8,20 +8,15 @@ public class ExceptionHandler {
 
     private static final Gson gson = new Gson();
 
-
     public static void register() {
-
 
         exception(BankException.class, (exception, request, response) -> {
 
-
             response.type("application/json");
-
 
             response.status(
                     exception.getStatusCode()
             );
-
 
             response.body(
                     gson.toJson(
@@ -30,10 +25,24 @@ public class ExceptionHandler {
                             )
                     )
             );
-
         });
 
 
-    }
+        exception(Exception.class, (exception, request, response) -> {
 
+            exception.printStackTrace();
+
+            response.type("application/json");
+
+            response.status(500);
+
+            response.body(
+                    gson.toJson(
+                            new ErrorResponse(
+                                    "Internal server error"
+                            )
+                    )
+            );
+        });
+    }
 }

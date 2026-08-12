@@ -102,11 +102,11 @@ void shouldReturnTransactionsForAccount() throws IOException {
 
 
     transactionService.createTransaction(
-            1,
-            2,
-            100
-    );
-
+        1,
+        2,
+        100,
+        "Test transfer"
+);
 
     HttpGet request =
             new HttpGet(

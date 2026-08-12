@@ -24,27 +24,29 @@ public class PostgresAccountRepository implements AccountRepository {
 
             AccountsRecord record =
                     dsl.insertInto(ACCOUNTS)
-                            .set(ACCOUNTS.OWNER, account.getOwner())
-                            .set(
+                            .set(ACCOUNTS.USER_ID, account.getUserId())
+                            .set(ACCOUNTS.BALANCE,
+                                    BigDecimal.valueOf(account.getBalance()))
+                            .set(ACCOUNTS.CARD_LAST4, account.getCardLast4())
+                            .returning(
+                                    ACCOUNTS.ID,
+                                    ACCOUNTS.USER_ID,
                                     ACCOUNTS.BALANCE,
-                                    BigDecimal.valueOf(account.getBalance())
+                                    ACCOUNTS.CARD_LAST4
                             )
-                            .returning(ACCOUNTS.ID)
                             .fetchOne();
 
             return new Account(
                     record.get(ACCOUNTS.ID),
-                    account.getOwner(),
-                    account.getBalance()
+                    record.get(ACCOUNTS.USER_ID),
+                    record.get(ACCOUNTS.BALANCE).doubleValue(),
+                    record.get(ACCOUNTS.CARD_LAST4)
             );
 
         } catch (Exception e) {
-
             throw new RuntimeException(e);
-
         }
     }
-
 
     @Override
     public List<Account> findAll() {
@@ -58,18 +60,16 @@ public class PostgresAccountRepository implements AccountRepository {
                     .map(record ->
                             new Account(
                                     record.get(ACCOUNTS.ID),
-                                    record.get(ACCOUNTS.OWNER),
-                                    record.get(ACCOUNTS.BALANCE).doubleValue()
+                                    record.get(ACCOUNTS.USER_ID),
+                                    record.get(ACCOUNTS.BALANCE).doubleValue(),
+                                    record.get(ACCOUNTS.CARD_LAST4)
                             )
                     );
 
         } catch (Exception e) {
-
             throw new RuntimeException(e);
-
         }
     }
-
 
     @Override
     public Account findById(int id) {
@@ -89,17 +89,15 @@ public class PostgresAccountRepository implements AccountRepository {
 
             return new Account(
                     record.get(ACCOUNTS.ID),
-                    record.get(ACCOUNTS.OWNER),
-                    record.get(ACCOUNTS.BALANCE).doubleValue()
+                    record.get(ACCOUNTS.USER_ID),
+                    record.get(ACCOUNTS.BALANCE).doubleValue(),
+                    record.get(ACCOUNTS.CARD_LAST4)
             );
 
         } catch (Exception e) {
-
             throw new RuntimeException(e);
-
         }
     }
-
 
     @Override
     public void update(Account account) {
@@ -109,18 +107,17 @@ public class PostgresAccountRepository implements AccountRepository {
             DSLContext dsl = DSL.using(connection);
 
             dsl.update(ACCOUNTS)
-                    .set(ACCOUNTS.OWNER, account.getOwner())
+                    .set(ACCOUNTS.USER_ID, account.getUserId())
                     .set(
                             ACCOUNTS.BALANCE,
                             BigDecimal.valueOf(account.getBalance())
                     )
+                    .set(ACCOUNTS.CARD_LAST4, account.getCardLast4())
                     .where(ACCOUNTS.ID.eq(account.getId()))
                     .execute();
 
         } catch (Exception e) {
-
             throw new RuntimeException(e);
-
         }
     }
 }

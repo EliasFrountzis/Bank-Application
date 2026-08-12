@@ -8,15 +8,12 @@ import java.util.List;
 
 public class TransactionService {
 
-
     private final TransactionRepository transactionRepository;
-
-   
 
 
     public TransactionService(
             TransactionRepository transactionRepository
-    ){
+    ) {
         this.transactionRepository = transactionRepository;
     }
 
@@ -24,8 +21,9 @@ public class TransactionService {
     public Transaction createTransaction(
             int fromId,
             int toId,
-            double amount
-    ){
+            double amount,
+            String description
+    ) {
 
         if (fromId == toId) {
 
@@ -33,7 +31,6 @@ public class TransactionService {
                     "Cannot transfer money to the same account",
                     400
             );
-
         }
 
 
@@ -43,7 +40,15 @@ public class TransactionService {
                     "Transaction amount must be positive",
                     400
             );
+        }
 
+
+        if (description == null || description.isBlank()) {
+
+            throw new BankException(
+                    "Transaction description cannot be empty",
+                    400
+            );
         }
 
 
@@ -52,26 +57,26 @@ public class TransactionService {
                         0,
                         fromId,
                         toId,
-                        amount
+                        amount,
+                        description
                 );
 
 
         return transactionRepository.save(transaction);
-
     }
 
 
-    public List<Transaction> getTransactions(){
+    public List<Transaction> getTransactions() {
 
         return transactionRepository.findAll();
-
     }
 
 
-    public List<Transaction> getTransactionsByAccount(int accountId){
+    public List<Transaction> getTransactionsByAccount(
+            int accountId
+    ) {
 
         return transactionRepository.findByAccountId(accountId);
-
     }
-
 }
+

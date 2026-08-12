@@ -6,6 +6,7 @@ package com.bank.jooq;
 
 import com.bank.jooq.tables.Accounts;
 import com.bank.jooq.tables.Transactions;
+import com.bank.jooq.tables.Users;
 
 
 /**
@@ -23,4 +24,9 @@ public class Tables {
      * The table <code>public.transactions</code>.
      */
     public static final Transactions TRANSACTIONS = Transactions.TRANSACTIONS;
+
+    /**
+     * The table <code>public.users</code>.
+     */
+    public static final Users USERS = Users.USERS;
 }

@@ -6,6 +6,7 @@ package com.bank.jooq;
 
 import com.bank.jooq.tables.Accounts;
 import com.bank.jooq.tables.Transactions;
+import com.bank.jooq.tables.Users;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,6 +41,11 @@ public class Public extends SchemaImpl {
     public final Transactions TRANSACTIONS = Transactions.TRANSACTIONS;
 
     /**
+     * The table <code>public.users</code>.
+     */
+    public final Users USERS = Users.USERS;
+
+    /**
      * No further instances allowed
      */
     private Public() {
@@ -56,7 +62,8 @@ public class Public extends SchemaImpl {
     public final List<Table<?>> getTables() {
         return Arrays.asList(
             Accounts.ACCOUNTS,
-            Transactions.TRANSACTIONS
+            Transactions.TRANSACTIONS,
+            Users.USERS
         );
     }
 }

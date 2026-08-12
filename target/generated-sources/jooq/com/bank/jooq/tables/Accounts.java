@@ -6,16 +6,24 @@ package com.bank.jooq.tables;
 
 import com.bank.jooq.Keys;
 import com.bank.jooq.Public;
+import com.bank.jooq.tables.Transactions.TransactionsPath;
+import com.bank.jooq.tables.Users.UsersPath;
 import com.bank.jooq.tables.records.AccountsRecord;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Stringly;
@@ -57,14 +65,19 @@ public class Accounts extends TableImpl<AccountsRecord> {
     public final TableField<AccountsRecord, Integer> ID = createField(DSL.name("id"), SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>public.accounts.owner</code>.
+     * The column <code>public.accounts.user_id</code>.
      */
-    public final TableField<AccountsRecord, String> OWNER = createField(DSL.name("owner"), SQLDataType.VARCHAR(100).nullable(false), this, "");
+    public final TableField<AccountsRecord, Integer> USER_ID = createField(DSL.name("user_id"), SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
      * The column <code>public.accounts.balance</code>.
      */
-    public final TableField<AccountsRecord, BigDecimal> BALANCE = createField(DSL.name("balance"), SQLDataType.NUMERIC(15, 2).nullable(false), this, "");
+    public final TableField<AccountsRecord, BigDecimal> BALANCE = createField(DSL.name("balance"), SQLDataType.NUMERIC(15, 2).nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.NUMERIC)), this, "");
+
+    /**
+     * The column <code>public.accounts.card_last4</code>.
+     */
+    public final TableField<AccountsRecord, String> CARD_LAST4 = createField(DSL.name("card_last4"), SQLDataType.VARCHAR(4).nullable(false), this, "");
 
     private Accounts(Name alias, Table<AccountsRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
@@ -95,6 +108,39 @@ public class Accounts extends TableImpl<AccountsRecord> {
         this(DSL.name("accounts"), null);
     }
 
+    public <O extends Record> Accounts(Table<O> path, ForeignKey<O, AccountsRecord> childPath, InverseForeignKey<O, AccountsRecord> parentPath) {
+        super(path, childPath, parentPath, ACCOUNTS);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class AccountsPath extends Accounts implements Path<AccountsRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> AccountsPath(Table<O> path, ForeignKey<O, AccountsRecord> childPath, InverseForeignKey<O, AccountsRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private AccountsPath(Name alias, Table<AccountsRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public AccountsPath as(String alias) {
+            return new AccountsPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public AccountsPath as(Name alias) {
+            return new AccountsPath(alias, this);
+        }
+
+        @Override
+        public AccountsPath as(Table<?> alias) {
+            return new AccountsPath(alias.getQualifiedName(), this);
+        }
+    }
+
     @Override
     public Schema getSchema() {
         return aliased() ? null : Public.PUBLIC;
@@ -103,6 +149,65 @@ public class Accounts extends TableImpl<AccountsRecord> {
     @Override
     public UniqueKey<AccountsRecord> getPrimaryKey() {
         return Keys.ACCOUNTS_PKEY;
+    }
+
+    @Override
+    public List<ForeignKey<AccountsRecord, ?>> getReferences() {
+        return Arrays.asList(Keys.ACCOUNTS__FK_ACCOUNT_USER);
+    }
+
+    private transient UsersPath _users;
+
+    /**
+     * Get the implicit join path to the <code>public.users</code> table.
+     */
+    public UsersPath users() {
+        if (_users == null)
+            _users = new UsersPath(this, Keys.ACCOUNTS__FK_ACCOUNT_USER, null);
+
+        return _users;
+    }
+
+    private transient TransactionsPath _fkFromAccount;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.transactions</code> table, via the
+     * <code>fk_from_account</code> key
+     */
+    public TransactionsPath fkFromAccount() {
+        if (_fkFromAccount == null)
+            _fkFromAccount = new TransactionsPath(this, null, Keys.TRANSACTIONS__FK_FROM_ACCOUNT.getInverseKey());
+
+        return _fkFromAccount;
+    }
+
+    private transient TransactionsPath _fkToAccount;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.transactions</code> table, via the
+     * <code>fk_to_account</code> key
+     */
+    public TransactionsPath fkToAccount() {
+        if (_fkToAccount == null)
+            _fkToAccount = new TransactionsPath(this, null, Keys.TRANSACTIONS__FK_TO_ACCOUNT.getInverseKey());
+
+        return _fkToAccount;
+    }
+
+    private transient TransactionsPath _fkTransactionAccount;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.transactions</code> table, via the
+     * <code>fk_transaction_account</code> key
+     */
+    public TransactionsPath fkTransactionAccount() {
+        if (_fkTransactionAccount == null)
+            _fkTransactionAccount = new TransactionsPath(this, null, Keys.TRANSACTIONS__FK_TRANSACTION_ACCOUNT.getInverseKey());
+
+        return _fkTransactionAccount;
     }
 
     @Override

@@ -6,17 +6,25 @@ package com.bank.jooq.tables;
 
 import com.bank.jooq.Keys;
 import com.bank.jooq.Public;
+import com.bank.jooq.tables.Accounts.AccountsPath;
 import com.bank.jooq.tables.records.TransactionsRecord;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
+import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Stringly;
@@ -58,19 +66,34 @@ public class Transactions extends TableImpl<TransactionsRecord> {
     public final TableField<TransactionsRecord, Integer> ID = createField(DSL.name("id"), SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
+     * The column <code>public.transactions.account_id</code>.
+     */
+    public final TableField<TransactionsRecord, Integer> ACCOUNT_ID = createField(DSL.name("account_id"), SQLDataType.INTEGER, this, "");
+
+    /**
+     * The column <code>public.transactions.type</code>.
+     */
+    public final TableField<TransactionsRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(20).nullable(false), this, "");
+
+    /**
      * The column <code>public.transactions.from_account</code>.
      */
-    public final TableField<TransactionsRecord, Integer> FROM_ACCOUNT = createField(DSL.name("from_account"), SQLDataType.INTEGER.nullable(false), this, "");
+    public final TableField<TransactionsRecord, Integer> FROM_ACCOUNT = createField(DSL.name("from_account"), SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>public.transactions.to_account</code>.
      */
-    public final TableField<TransactionsRecord, Integer> TO_ACCOUNT = createField(DSL.name("to_account"), SQLDataType.INTEGER.nullable(false), this, "");
+    public final TableField<TransactionsRecord, Integer> TO_ACCOUNT = createField(DSL.name("to_account"), SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>public.transactions.amount</code>.
      */
     public final TableField<TransactionsRecord, BigDecimal> AMOUNT = createField(DSL.name("amount"), SQLDataType.NUMERIC(15, 2).nullable(false), this, "");
+
+    /**
+     * The column <code>public.transactions.description</code>.
+     */
+    public final TableField<TransactionsRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column <code>public.transactions.timestamp</code>.
@@ -106,6 +129,39 @@ public class Transactions extends TableImpl<TransactionsRecord> {
         this(DSL.name("transactions"), null);
     }
 
+    public <O extends Record> Transactions(Table<O> path, ForeignKey<O, TransactionsRecord> childPath, InverseForeignKey<O, TransactionsRecord> parentPath) {
+        super(path, childPath, parentPath, TRANSACTIONS);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class TransactionsPath extends Transactions implements Path<TransactionsRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> TransactionsPath(Table<O> path, ForeignKey<O, TransactionsRecord> childPath, InverseForeignKey<O, TransactionsRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private TransactionsPath(Name alias, Table<TransactionsRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public TransactionsPath as(String alias) {
+            return new TransactionsPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public TransactionsPath as(Name alias) {
+            return new TransactionsPath(alias, this);
+        }
+
+        @Override
+        public TransactionsPath as(Table<?> alias) {
+            return new TransactionsPath(alias.getQualifiedName(), this);
+        }
+    }
+
     @Override
     public Schema getSchema() {
         return aliased() ? null : Public.PUBLIC;
@@ -114,6 +170,57 @@ public class Transactions extends TableImpl<TransactionsRecord> {
     @Override
     public UniqueKey<TransactionsRecord> getPrimaryKey() {
         return Keys.TRANSACTIONS_PKEY;
+    }
+
+    @Override
+    public List<ForeignKey<TransactionsRecord, ?>> getReferences() {
+        return Arrays.asList(Keys.TRANSACTIONS__FK_FROM_ACCOUNT, Keys.TRANSACTIONS__FK_TO_ACCOUNT, Keys.TRANSACTIONS__FK_TRANSACTION_ACCOUNT);
+    }
+
+    private transient AccountsPath _fkFromAccount;
+
+    /**
+     * Get the implicit join path to the <code>public.accounts</code> table, via
+     * the <code>fk_from_account</code> key.
+     */
+    public AccountsPath fkFromAccount() {
+        if (_fkFromAccount == null)
+            _fkFromAccount = new AccountsPath(this, Keys.TRANSACTIONS__FK_FROM_ACCOUNT, null);
+
+        return _fkFromAccount;
+    }
+
+    private transient AccountsPath _fkToAccount;
+
+    /**
+     * Get the implicit join path to the <code>public.accounts</code> table, via
+     * the <code>fk_to_account</code> key.
+     */
+    public AccountsPath fkToAccount() {
+        if (_fkToAccount == null)
+            _fkToAccount = new AccountsPath(this, Keys.TRANSACTIONS__FK_TO_ACCOUNT, null);
+
+        return _fkToAccount;
+    }
+
+    private transient AccountsPath _fkTransactionAccount;
+
+    /**
+     * Get the implicit join path to the <code>public.accounts</code> table, via
+     * the <code>fk_transaction_account</code> key.
+     */
+    public AccountsPath fkTransactionAccount() {
+        if (_fkTransactionAccount == null)
+            _fkTransactionAccount = new AccountsPath(this, Keys.TRANSACTIONS__FK_TRANSACTION_ACCOUNT, null);
+
+        return _fkTransactionAccount;
+    }
+
+    @Override
+    public List<Check<TransactionsRecord>> getChecks() {
+        return Arrays.asList(
+            Internal.createCheck(this, DSL.name("chk_transaction_type"), "(((type)::text = ANY ((ARRAY['TRANSFER'::character varying, 'DEPOSIT'::character varying, 'WITHDRAWAL'::character varying])::text[])))", true)
+        );
     }
 
     @Override

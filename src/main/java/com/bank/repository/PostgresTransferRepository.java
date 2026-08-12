@@ -18,10 +18,25 @@ public class PostgresTransferRepository implements TransferRepository {
 
     @Override
     public void transfer(
-            int fromAccount,
-            int toAccount,
-            double amount
-    ) {
+        int fromAccount,
+        int toAccount,
+        double amount,
+        String description
+) {
+
+        if (amount <= 0) {
+            throw new BankException(
+                    "Transfer amount must be greater than zero",
+                    400
+            );
+        }
+
+        if (fromAccount == toAccount) {
+            throw new BankException(
+                    "Cannot transfer money to the same account",
+                    400
+            );
+        }
 
         try (Connection connection =
                      DatabaseConnection.getConnection()) {
@@ -32,20 +47,13 @@ public class PostgresTransferRepository implements TransferRepository {
 
                 DSLContext dsl = DSL.using(connection);
 
-                /*
-                 * Lock both accounts in a consistent order.
-                 *
-                 * This prevents two opposite transfers from
-                 * acquiring the locks in different orders.
-                 */
+              
                 int firstLock = Math.min(fromAccount, toAccount);
                 int secondLock = Math.max(fromAccount, toAccount);
 
                 double senderBalance = 0;
 
-                /*
-                 * Lock the first account.
-                 */
+                
                 AccountsRecord firstRecord =
                         dsl.selectFrom(ACCOUNTS)
                                 .where(ACCOUNTS.ID.eq(firstLock))
@@ -53,7 +61,6 @@ public class PostgresTransferRepository implements TransferRepository {
                                 .fetchOne();
 
                 if (firstRecord == null) {
-
                     throw new BankException(
                             "Account with id " + firstLock + " not found",
                             404
@@ -65,9 +72,7 @@ public class PostgresTransferRepository implements TransferRepository {
                             firstRecord.get(ACCOUNTS.BALANCE).doubleValue();
                 }
 
-                /*
-                 * Lock the second account.
-                 */
+                
                 AccountsRecord secondRecord =
                         dsl.selectFrom(ACCOUNTS)
                                 .where(ACCOUNTS.ID.eq(secondLock))
@@ -75,7 +80,6 @@ public class PostgresTransferRepository implements TransferRepository {
                                 .fetchOne();
 
                 if (secondRecord == null) {
-
                     throw new BankException(
                             "Account with id " + secondLock + " not found",
                             404
@@ -87,24 +91,15 @@ public class PostgresTransferRepository implements TransferRepository {
                             secondRecord.get(ACCOUNTS.BALANCE).doubleValue();
                 }
 
-                /*
-                 * The balance check happens AFTER the sender row
-                 * has been locked.
-                 *
-                 * Therefore another concurrent transfer cannot
-                 * change this balance while we are using it.
-                 */
+              
                 if (senderBalance < amount) {
-
                     throw new BankException(
                             "Insufficient funds",
                             400
                     );
                 }
 
-                /*
-                 * Withdraw from sender.
-                 */
+               
                 dsl.update(ACCOUNTS)
                         .set(
                                 ACCOUNTS.BALANCE,
@@ -115,9 +110,7 @@ public class PostgresTransferRepository implements TransferRepository {
                         .where(ACCOUNTS.ID.eq(fromAccount))
                         .execute();
 
-                /*
-                 * Deposit into receiver.
-                 */
+              
                 dsl.update(ACCOUNTS)
                         .set(
                                 ACCOUNTS.BALANCE,
@@ -128,42 +121,43 @@ public class PostgresTransferRepository implements TransferRepository {
                         .where(ACCOUNTS.ID.eq(toAccount))
                         .execute();
 
-                /*
-                 * Record the transaction.
-                 */
-                dsl.insertInto(TRANSACTIONS)
-                        .set(
-                                TRANSACTIONS.FROM_ACCOUNT,
-                                fromAccount
-                        )
-                        .set(
-                                TRANSACTIONS.TO_ACCOUNT,
-                                toAccount
-                        )
-                        .set(
-                                TRANSACTIONS.AMOUNT,
-                                BigDecimal.valueOf(amount)
-                        )
-                        .set(
-                                TRANSACTIONS.TIMESTAMP,
-                                LocalDateTime.now()
-                        )
-                        .execute();
-
-                /*
-                 * Everything succeeded.
-                 */
+                
+               dsl.insertInto(TRANSACTIONS)
+    .set(
+            TRANSACTIONS.ACCOUNT_ID,
+            (Integer) null
+    )
+    .set(
+            TRANSACTIONS.TYPE,
+            "TRANSFER"
+    )
+    .set(
+            TRANSACTIONS.FROM_ACCOUNT,
+            fromAccount
+    )
+    .set(
+            TRANSACTIONS.TO_ACCOUNT,
+            toAccount
+    )
+    .set(
+            TRANSACTIONS.AMOUNT,
+            BigDecimal.valueOf(amount)
+    )
+    .set(
+            TRANSACTIONS.DESCRIPTION,
+            description
+    )
+    .set(
+            TRANSACTIONS.TIMESTAMP,
+            LocalDateTime.now()
+    )
+    .execute();
+                
                 connection.commit();
 
             } catch (Exception e) {
 
-                /*
-                 * Any failure rolls back the entire transfer:
-                 *
-                 * - account withdrawal
-                 * - account deposit
-                 * - transaction record
-                 */
+                
                 connection.rollback();
 
                 throw e;
@@ -182,4 +176,3 @@ public class PostgresTransferRepository implements TransferRepository {
         }
     }
 }
-

@@ -1,7 +1,6 @@
 package com.bank.repository;
 
 import com.bank.database.DatabaseConnection;
-import com.bank.jooq.tables.records.TransactionsRecord;
 import com.bank.model.Transaction;
 
 import org.jooq.DSLContext;
@@ -13,7 +12,9 @@ import java.util.List;
 
 import static com.bank.jooq.tables.Transactions.TRANSACTIONS;
 
-public class PostgresTransactionRepository implements TransactionRepository {
+public class PostgresTransactionRepository
+        implements TransactionRepository {
+
 
     @Override
     public Transaction save(Transaction transaction) {
@@ -23,8 +24,16 @@ public class PostgresTransactionRepository implements TransactionRepository {
 
             DSLContext dsl = DSL.using(connection);
 
-            TransactionsRecord record =
+            var query =
                     dsl.insertInto(TRANSACTIONS)
+                            .set(
+                                    TRANSACTIONS.ACCOUNT_ID,
+                                    transaction.getAccountId()
+                            )
+                            .set(
+                                    TRANSACTIONS.TYPE,
+                                    transaction.getType()
+                            )
                             .set(
                                     TRANSACTIONS.FROM_ACCOUNT,
                                     transaction.getFromAccount()
@@ -33,35 +42,45 @@ public class PostgresTransactionRepository implements TransactionRepository {
                                     TRANSACTIONS.TO_ACCOUNT,
                                     transaction.getToAccount()
                             )
-                            .set(TRANSACTIONS.AMOUNT,
-                                BigDecimal.valueOf(transaction.getAmount()))
-                            
+                            .set(
+                                    TRANSACTIONS.AMOUNT,
+                                    BigDecimal.valueOf(
+                                            transaction.getAmount()
+                                    )
+                            )
+                            .set(
+                                    TRANSACTIONS.DESCRIPTION,
+                                    transaction.getDescription()
+                            )
                             .set(
                                     TRANSACTIONS.TIMESTAMP,
                                     LocalDateTime.parse(
                                             transaction.getTimestamp()
                                     )
-                            )
-                            .returning(TRANSACTIONS.ID)
-                            .fetchOne();
+                            );
+
+            var record =
+                    query.returning(TRANSACTIONS.ID)
+                         .fetchOne();
 
             if (record == null) {
                 return null;
             }
 
-           return new Transaction(
-        record.get(TRANSACTIONS.ID),
-        transaction.getFromAccount(),
-        transaction.getToAccount(),
-        transaction.getAmount(),
-        transaction.getTimestamp()
-);
-            
+            return new Transaction(
+                    record.get(TRANSACTIONS.ID),
+                    transaction.getAccountId(),
+                    transaction.getType(),
+                    transaction.getFromAccount(),
+                    transaction.getToAccount(),
+                    transaction.getAmount(),
+                    transaction.getDescription(),
+                    transaction.getTimestamp()
+            );
 
         } catch (Exception e) {
 
             throw new RuntimeException(e);
-
         }
     }
 
@@ -78,17 +97,25 @@ public class PostgresTransactionRepository implements TransactionRepository {
                     .fetch()
                     .map(record ->
                             new Transaction(
-                                        record.get(TRANSACTIONS.ID),
-                                        record.get(TRANSACTIONS.FROM_ACCOUNT),
-                                        record.get(TRANSACTIONS.TO_ACCOUNT),
-                                        record.get(TRANSACTIONS.AMOUNT).doubleValue(),
-                                        record.get(TRANSACTIONS.TIMESTAMP).toString())
+                                    record.get(TRANSACTIONS.ID),
+                                    record.get(TRANSACTIONS.ACCOUNT_ID),
+                                    record.get(TRANSACTIONS.TYPE),
+                                    record.get(TRANSACTIONS.FROM_ACCOUNT),
+                                    record.get(TRANSACTIONS.TO_ACCOUNT),
+                                    record.get(TRANSACTIONS.AMOUNT)
+                                            .doubleValue(),
+                                    record.get(
+                                            TRANSACTIONS.DESCRIPTION
+                                    ),
+                                    record.get(
+                                            TRANSACTIONS.TIMESTAMP
+                                    ).toString()
+                            )
                     );
 
         } catch (Exception e) {
 
             throw new RuntimeException(e);
-
         }
     }
 
@@ -103,27 +130,48 @@ public class PostgresTransactionRepository implements TransactionRepository {
 
             return dsl.selectFrom(TRANSACTIONS)
                     .where(
-                            TRANSACTIONS.FROM_ACCOUNT.eq(accountId)
+                            TRANSACTIONS.ACCOUNT_ID.eq(accountId)
                                     .or(
-                                            TRANSACTIONS.TO_ACCOUNT.eq(accountId)
+                                            TRANSACTIONS.FROM_ACCOUNT
+                                                    .eq(accountId)
+                                    )
+                                    .or(
+                                            TRANSACTIONS.TO_ACCOUNT
+                                                    .eq(accountId)
                                     )
                     )
                     .fetch()
                     .map(record ->
-                           new Transaction(
-                                record.get(TRANSACTIONS.ID),
-                                record.get(TRANSACTIONS.FROM_ACCOUNT),
-                                record.get(TRANSACTIONS.TO_ACCOUNT),
-                                record.get(TRANSACTIONS.AMOUNT).doubleValue(),
-                                record.get(TRANSACTIONS.TIMESTAMP).toString()
-                        )
+                            new Transaction(
+                                    record.get(TRANSACTIONS.ID),
+                                    record.get(
+                                            TRANSACTIONS.ACCOUNT_ID
+                                    ),
+                                    record.get(
+                                            TRANSACTIONS.TYPE
+                                    ),
+                                    record.get(
+                                            TRANSACTIONS.FROM_ACCOUNT
+                                    ),
+                                    record.get(
+                                            TRANSACTIONS.TO_ACCOUNT
+                                    ),
+                                    record.get(
+                                            TRANSACTIONS.AMOUNT
+                                    ).doubleValue(),
+                                    record.get(
+                                            TRANSACTIONS.DESCRIPTION
+                                    ),
+                                    record.get(
+                                            TRANSACTIONS.TIMESTAMP
+                                    ).toString()
+                            )
                     );
 
         } catch (Exception e) {
 
             throw new RuntimeException(e);
-
         }
-    
+    }
 }
-}
+

@@ -35,17 +35,17 @@ public class AccountsRecord extends UpdatableRecordImpl<AccountsRecord> {
     }
 
     /**
-     * Setter for <code>public.accounts.owner</code>.
+     * Setter for <code>public.accounts.user_id</code>.
      */
-    public void setOwner(String value) {
+    public void setUserId(Integer value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>public.accounts.owner</code>.
+     * Getter for <code>public.accounts.user_id</code>.
      */
-    public String getOwner() {
-        return (String) get(1);
+    public Integer getUserId() {
+        return (Integer) get(1);
     }
 
     /**
@@ -60,6 +60,20 @@ public class AccountsRecord extends UpdatableRecordImpl<AccountsRecord> {
      */
     public BigDecimal getBalance() {
         return (BigDecimal) get(2);
+    }
+
+    /**
+     * Setter for <code>public.accounts.card_last4</code>.
+     */
+    public void setCardLast4(String value) {
+        set(3, value);
+    }
+
+    /**
+     * Getter for <code>public.accounts.card_last4</code>.
+     */
+    public String getCardLast4() {
+        return (String) get(3);
     }
 
     // -------------------------------------------------------------------------
@@ -85,12 +99,13 @@ public class AccountsRecord extends UpdatableRecordImpl<AccountsRecord> {
     /**
      * Create a detached, initialised AccountsRecord
      */
-    public AccountsRecord(Integer id, String owner, BigDecimal balance) {
+    public AccountsRecord(Integer id, Integer userId, BigDecimal balance, String cardLast4) {
         super(Accounts.ACCOUNTS);
 
         setId(id);
-        setOwner(owner);
+        setUserId(userId);
         setBalance(balance);
+        setCardLast4(cardLast4);
         resetTouchedOnNotNull();
     }
 }

@@ -3,41 +3,38 @@ package com.bank.model;
 public class Account {
 
     private int id;
-    private String owner;
+    private int userId;
     private double balance;
+    private String cardLast4;
 
-    public Account(int id, String owner, double balance) {
+    public Account(int id, int userId, double balance, String cardLast4) {
         this.id = id;
-        this.owner = owner;
+        this.userId = userId;
         this.balance = balance;
+        this.cardLast4 = cardLast4;
     }
 
     public int getId() {
         return id;
     }
 
-    public String getOwner() {
-        return owner;
+    public int getUserId() {
+        return userId;
     }
 
     public double getBalance() {
         return balance;
     }
 
-
-
-
+    public String getCardLast4() {
+        return cardLast4;
+    }
 
     public void deposit(double amount) {
-    balance += amount;
-}
+        balance += amount;
+    }
 
-public void withdraw(double amount) {
-    balance -= amount;
-}
-
-
-
-
-
+    public void withdraw(double amount) {
+        balance -= amount;
+    }
 }
