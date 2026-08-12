@@ -1,5 +1,5 @@
 package com.bank.database;
-import org.junit.jupiter.api.AfterAll;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -8,6 +8,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 public abstract class PostgresIntegrationTest {
 
+    @SuppressWarnings("resource")
     @Container
     protected static PostgreSQLContainer<?> postgres =
             new PostgreSQLContainer<>("postgres:16")
@@ -17,9 +18,7 @@ public abstract class PostgresIntegrationTest {
                     .withInitScript("schema.sql");
 
     @BeforeAll
-    static void startContainer() {
-
-        postgres.start();
+    static void configureDatabase() {
 
         System.setProperty(
                 "db.url",
@@ -36,8 +35,4 @@ public abstract class PostgresIntegrationTest {
                 postgres.getPassword()
         );
     }
-    @AfterAll
-static void stopContainer() {
-    postgres.stop();
-}
 }
