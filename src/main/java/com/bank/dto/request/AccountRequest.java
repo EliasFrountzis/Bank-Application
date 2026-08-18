@@ -3,7 +3,12 @@ package com.bank.dto.request;
 public class AccountRequest {
 
     public int userId;
+
     public double balance;
+
     public String cardLast4;
 
+    public String name;
+
+    public String type;
 }

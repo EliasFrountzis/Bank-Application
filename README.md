@@ -39,6 +39,11 @@ The backend currently supports:
     Account creation
     Account lookup
     Account listing
+    Account naming
+    Account type selection
+    Account status management
+    Account detail updates
+    Account closing
     Deposits
     Withdrawals
     Transfers
@@ -58,6 +63,38 @@ The application currently stores only the last four digits of a card number. Its
 
 For example:
 **** **** **** 1234
+
+
+
+## Accounts
+
+Each account contains:
+
+    Account name
+    Account type
+    Account status
+    Balance
+    Card last four digits
+
+The account type is selected from predefined types such as:
+
+    CURRENT
+    SAVINGS
+
+The account name is user-defined, allowing users to give their accounts names that make sense to them.
+
+For example:
+
+    Name: Everyday Spending
+    Type: CURRENT
+
+or:
+
+    Name: Holiday Savings
+    Type: SAVINGS
+
+Accounts can also be updated and closed. Closing an account changes its status rather than immediately deleting the account, allowing the account and its transaction history to remain part of the database.
+
 
 
 ## API
@@ -91,33 +128,46 @@ POST /accounts
 {
   "userId": 1,
   "balance": 1000,
-  "cardLast4": "1234"
+  "cardLast4": "1234",
+  "name": "Everyday Spending",
+  "type": "CURRENT"
 }
-
 
 #### Get all accounts
 
 GET /accounts
 
+#### Get accounts for a user
+
+GET /users/:userId/accounts
 
 #### Get account
 
 GET /accounts/:id
 
+#### Update account details
+
+PUT /accounts/:id
+
+{
+  "name": "Holiday Savings",
+  "type": "SAVINGS"
+}
+
+#### Close account
+
+POST /accounts/:id/close
 
 #### Deposit
 
 POST /accounts/:id/deposit
 
-
 Example body:
 100
-
 
 #### Withdraw
 
 POST /accounts/:id/withdraw
-
 
 Example body:
 50
@@ -167,12 +217,18 @@ This allows business logic to be tested without requiring a running PostgreSQL d
 
 ### Repository Integration Tests
 
+### Repository Integration Tests
+
 PostgreSQL repositories are tested against a real PostgreSQL instance using Testcontainers.
 
- PostgresUserRepositoryTest
- PostgresAccountRepositoryTest
- PostgresTransactionRepositoryTest
- PostgresTransferRepositoryTest
+    PostgresUserRepositoryTest
+    PostgresAccountRepositoryTest
+    PostgresTransactionRepositoryTest
+    PostgresTransferRepositoryTest
+
+The account repository tests also cover account names, account types, account status, and updating account details.
+
+The transfer repository tests include concurrent transfer testing to ensure that two simultaneous transfers cannot cause an account to become overdrawn.
 
 
 ### Controller Tests

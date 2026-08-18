@@ -11,9 +11,21 @@ CREATE TABLE IF NOT EXISTS accounts (
     balance NUMERIC(15,2) NOT NULL DEFAULT 0,
     card_last4 VARCHAR(4) NOT NULL,
 
+    name VARCHAR(100) NOT NULL DEFAULT 'My Account',
+
+    type VARCHAR(20) NOT NULL DEFAULT 'CURRENT',
+
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+
     CONSTRAINT fk_account_user
         FOREIGN KEY (user_id)
-        REFERENCES users(id)
+        REFERENCES users(id),
+
+    CONSTRAINT chk_account_type
+        CHECK (type IN ('CURRENT', 'SAVINGS')),
+
+    CONSTRAINT chk_account_status
+        CHECK (status IN ('ACTIVE', 'CLOSED'))
 );
 
 CREATE TABLE IF NOT EXISTS transactions (

@@ -27,6 +27,7 @@ public class TransferServiceTest {
 
     private InMemoryTransferRepository transferRepository;
 
+
     @BeforeEach
     void setup() {
 
@@ -36,47 +37,77 @@ public class TransferServiceTest {
         TransactionRepository transactionRepository =
                 new InMemoryTransactionRepository();
 
+
         UserRepository userRepository =
                 new UserRepository() {
 
                     private final List<User> users =
                             new ArrayList<>();
 
+
                     @Override
                     public User save(User user) {
+
                         users.add(user);
+
                         return user;
                     }
+
 
                     @Override
                     public User findById(int id) {
 
                         return users.stream()
-                                .filter(user ->
-                                        user.getId() == id)
+                                .filter(
+                                        user ->
+                                                user.getId() == id
+                                )
                                 .findFirst()
                                 .orElse(null);
                     }
+
 
                     @Override
                     public User findByEmail(String email) {
 
                         return users.stream()
-                                .filter(user ->
-                                        user.getEmail()
-                                                .equals(email))
+                                .filter(
+                                        user ->
+                                                user.getEmail()
+                                                        .equalsIgnoreCase(email)
+                                )
                                 .findFirst()
                                 .orElse(null);
                     }
 
+
+                    @Override
+                    public User findByName(String name) {
+
+                        return users.stream()
+                                .filter(
+                                        user ->
+                                                user.getName()
+                                                        .equalsIgnoreCase(name)
+                                )
+                                .findFirst()
+                                .orElse(null);
+                    }
+
+
                     @Override
                     public List<User> findAll() {
+
                         return users;
                     }
                 };
 
+
         UserService userService =
-                new UserService(userRepository);
+                new UserService(
+                        userRepository
+                );
+
 
         accountService =
                 new AccountService(
@@ -85,7 +116,7 @@ public class TransferServiceTest {
                         transactionRepository
                 );
 
-        // Users required by AccountService.createAccount()
+
         userRepository.save(
                 new User(
                         1,
@@ -94,6 +125,7 @@ public class TransferServiceTest {
                         "password"
                 )
         );
+
 
         userRepository.save(
                 new User(
@@ -104,8 +136,10 @@ public class TransferServiceTest {
                 )
         );
 
+
         transferRepository =
                 new InMemoryTransferRepository();
+
 
         transferService =
                 new TransferService(
@@ -114,6 +148,7 @@ public class TransferServiceTest {
                 );
     }
 
+
     @Test
     void shouldTransferMoneySuccessfully() {
 
@@ -121,18 +156,25 @@ public class TransferServiceTest {
                 accountService.createAccount(
                         1,
                         1000,
-                        "1234"
+                        "1234",
+                        "Alice Current",
+                        "CURRENT"
                 );
+
 
         Account bob =
                 accountService.createAccount(
                         2,
                         500,
-                        "5678"
+                        "5678",
+                        "Bob Current",
+                        "CURRENT"
                 );
+
 
         transferRepository.addAccount(alice);
         transferRepository.addAccount(bob);
+
 
         transferService.transfer(
                 alice.getId(),
@@ -141,16 +183,19 @@ public class TransferServiceTest {
                 "Groceries"
         );
 
+
         assertEquals(
                 800,
                 alice.getBalance()
         );
+
 
         assertEquals(
                 700,
                 bob.getBalance()
         );
     }
+
 
     @Test
     void shouldNotTransferWhenInsufficientFunds() {
@@ -159,18 +204,25 @@ public class TransferServiceTest {
                 accountService.createAccount(
                         1,
                         100,
-                        "1234"
+                        "1234",
+                        "Alice Current",
+                        "CURRENT"
                 );
+
 
         Account bob =
                 accountService.createAccount(
                         2,
                         500,
-                        "5678"
+                        "5678",
+                        "Bob Current",
+                        "CURRENT"
                 );
+
 
         transferRepository.addAccount(alice);
         transferRepository.addAccount(bob);
+
 
         assertThrows(
                 BankException.class,
@@ -182,16 +234,19 @@ public class TransferServiceTest {
                 )
         );
 
+
         assertEquals(
                 100,
                 alice.getBalance()
         );
+
 
         assertEquals(
                 500,
                 bob.getBalance()
         );
     }
+
 
     @Test
     void shouldNotTransferWhenAccountDoesNotExist() {
@@ -200,10 +255,14 @@ public class TransferServiceTest {
                 accountService.createAccount(
                         2,
                         500,
-                        "5678"
+                        "5678",
+                        "Bob Current",
+                        "CURRENT"
                 );
 
+
         transferRepository.addAccount(bob);
+
 
         assertThrows(
                 BankException.class,
@@ -215,10 +274,10 @@ public class TransferServiceTest {
                 )
         );
 
+
         assertEquals(
                 500,
                 bob.getBalance()
         );
     }
 }
-

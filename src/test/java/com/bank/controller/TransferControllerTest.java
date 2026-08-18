@@ -43,7 +43,6 @@ public class TransferControllerTest {
 
         ExceptionHandler.register();
 
-       
         UserRepository userRepository =
                 new UserRepository() {
 
@@ -87,7 +86,20 @@ public class TransferControllerTest {
                                 .filter(
                                         user ->
                                                 user.getEmail()
-                                                        .equals(email)
+                                                        .equalsIgnoreCase(email)
+                                )
+                                .findFirst()
+                                .orElse(null);
+                    }
+
+                    @Override
+                    public User findByName(String name) {
+
+                        return users.stream()
+                                .filter(
+                                        user ->
+                                                user.getName()
+                                                        .equalsIgnoreCase(name)
                                 )
                                 .findFirst()
                                 .orElse(null);
@@ -105,7 +117,6 @@ public class TransferControllerTest {
                         userRepository
                 );
 
-        
         userService.createUser(
                 "Alice",
                 "alice@test.com",
@@ -118,11 +129,8 @@ public class TransferControllerTest {
                 "password"
         );
 
-        
         AccountRepository accountRepository =
                 new InMemoryAccountRepository();
-
-     
 
         TransactionRepository transactionRepository =
                 new TransactionRepository() {
@@ -161,7 +169,6 @@ public class TransferControllerTest {
                     }
                 };
 
-      
         AccountService accountService =
                 new AccountService(
                         accountRepository,
@@ -169,18 +176,15 @@ public class TransferControllerTest {
                         transactionRepository
                 );
 
-        
         InMemoryTransferRepository transferRepository =
                 new InMemoryTransferRepository();
 
-        
         TransferService transferService =
                 new TransferService(
                         accountService,
                         transferRepository
                 );
 
-        
         User aliceUser =
                 userService.getUserById(1);
 
@@ -188,24 +192,26 @@ public class TransferControllerTest {
                 userService.getUserById(2);
 
         alice =
-                accountService.createAccount(
-                        aliceUser.getId(),
-                        1000,
-                        "1234"
-                );
+        accountService.createAccount(
+                aliceUser.getId(),
+                1000,
+                "1234",
+                "Alice Current",
+                "CURRENT"
+        );
 
-        bob =
-                accountService.createAccount(
-                        bobUser.getId(),
-                        500,
-                        "5678"
-                );
+bob =
+        accountService.createAccount(
+                bobUser.getId(),
+                500,
+                "5678",
+                "Bob Current",
+                "CURRENT"
+        );
 
-        
         transferRepository.addAccount(alice);
         transferRepository.addAccount(bob);
 
-       
         TransferController controller =
                 new TransferController(
                         transferService
@@ -267,7 +273,6 @@ public class TransferControllerTest {
             );
         }
 
-        
         assertEquals(
                 900,
                 alice.getBalance()
@@ -279,4 +284,3 @@ public class TransferControllerTest {
         );
     }
 }
-

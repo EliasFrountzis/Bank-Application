@@ -12,6 +12,7 @@ public class InMemoryAccountRepository implements AccountRepository {
 
     private int nextId = 1;
 
+
     @Override
     public Account save(Account account) {
 
@@ -20,7 +21,10 @@ public class InMemoryAccountRepository implements AccountRepository {
                         nextId++,
                         account.getUserId(),
                         account.getBalance(),
-                        account.getCardLast4()
+                        account.getCardLast4(),
+                        account.getName(),
+                        account.getType(),
+                        account.getStatus()
                 );
 
         accounts.add(saved);
@@ -28,10 +32,13 @@ public class InMemoryAccountRepository implements AccountRepository {
         return saved;
     }
 
+
     @Override
     public List<Account> findAll() {
+
         return accounts;
     }
+
 
     @Override
     public Account findById(int id) {
@@ -42,8 +49,39 @@ public class InMemoryAccountRepository implements AccountRepository {
                 .orElse(null);
     }
 
+
+    @Override
+    public List<Account> findByUserId(int userId) {
+
+        return accounts.stream()
+                .filter(a -> a.getUserId() == userId)
+                .toList();
+    }
+
+
     @Override
     public void update(Account account) {
-        // not needed for tests yet
+
+        Account existing =
+                findById(account.getId());
+
+        if (existing == null) {
+            return;
+        }
+
+        existing.updateDetails(
+                account.getName(),
+                account.getType()
+        );
+
+        if (!existing.getStatus()
+                .equals(account.getStatus())) {
+
+            if (account.getStatus()
+                    .equals("CLOSED")) {
+
+                existing.close();
+            }
+        }
     }
 }

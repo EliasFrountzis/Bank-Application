@@ -39,7 +39,18 @@ public class InMemoryUserRepository implements UserRepository {
 
         return users.stream()
                 .filter(user ->
-                        user.getEmail().equals(email)
+                        user.getEmail().equalsIgnoreCase(email)
+                )
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    public User findByName(String name) {
+
+        return users.stream()
+                .filter(user ->
+                        user.getName().equalsIgnoreCase(name)
                 )
                 .findFirst()
                 .orElse(null);

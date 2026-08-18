@@ -22,7 +22,7 @@ public class PostgresUserRepository implements UserRepository {
                     DatabaseConnection.getConnection();
 
             return DSL.using(connection);
-            
+
         } catch (SQLException e) {
 
             throw new RuntimeException(
@@ -88,7 +88,35 @@ public class PostgresUserRepository implements UserRepository {
 
         UsersRecord record =
                 dsl.selectFrom(USERS)
-                        .where(USERS.EMAIL.eq(email))
+                        .where(
+                                DSL.lower(USERS.EMAIL)
+                                        .eq(email.toLowerCase())
+                        )
+                        .fetchOne();
+
+        if (record == null) {
+            return null;
+        }
+
+        return new User(
+                record.getId(),
+                record.getName(),
+                record.getEmail(),
+                record.getPasswordHash()
+        );
+    }
+
+    @Override
+    public User findByName(String name) {
+
+        DSLContext dsl = getDsl();
+
+        UsersRecord record =
+                dsl.selectFrom(USERS)
+                        .where(
+                                DSL.lower(USERS.NAME)
+                                        .eq(name.toLowerCase())
+                        )
                         .fetchOne();
 
         if (record == null) {
@@ -120,4 +148,3 @@ public class PostgresUserRepository implements UserRepository {
                 );
     }
 }
-

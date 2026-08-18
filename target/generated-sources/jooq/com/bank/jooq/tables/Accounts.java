@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -78,6 +79,21 @@ public class Accounts extends TableImpl<AccountsRecord> {
      * The column <code>public.accounts.card_last4</code>.
      */
     public final TableField<AccountsRecord, String> CARD_LAST4 = createField(DSL.name("card_last4"), SQLDataType.VARCHAR(4).nullable(false), this, "");
+
+    /**
+     * The column <code>public.accounts.name</code>.
+     */
+    public final TableField<AccountsRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).nullable(false).defaultValue(DSL.field(DSL.raw("'My Account'::character varying"), SQLDataType.VARCHAR)), this, "");
+
+    /**
+     * The column <code>public.accounts.type</code>.
+     */
+    public final TableField<AccountsRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(20).nullable(false).defaultValue(DSL.field(DSL.raw("'CURRENT'::character varying"), SQLDataType.VARCHAR)), this, "");
+
+    /**
+     * The column <code>public.accounts.status</code>.
+     */
+    public final TableField<AccountsRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(20).nullable(false).defaultValue(DSL.field(DSL.raw("'ACTIVE'::character varying"), SQLDataType.VARCHAR)), this, "");
 
     private Accounts(Name alias, Table<AccountsRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
@@ -208,6 +224,14 @@ public class Accounts extends TableImpl<AccountsRecord> {
             _fkTransactionAccount = new TransactionsPath(this, null, Keys.TRANSACTIONS__FK_TRANSACTION_ACCOUNT.getInverseKey());
 
         return _fkTransactionAccount;
+    }
+
+    @Override
+    public List<Check<AccountsRecord>> getChecks() {
+        return Arrays.asList(
+            Internal.createCheck(this, DSL.name("chk_account_status"), "(((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'CLOSED'::character varying])::text[])))", true),
+            Internal.createCheck(this, DSL.name("chk_account_type"), "(((type)::text = ANY ((ARRAY['CURRENT'::character varying, 'SAVINGS'::character varying])::text[])))", true)
+        );
     }
 
     @Override

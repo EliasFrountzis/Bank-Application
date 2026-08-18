@@ -45,7 +45,10 @@ public class UserServiceTest {
                     public User findById(int id) {
 
                         return users.stream()
-                                .filter(user -> user.getId() == id)
+                                .filter(
+                                        user ->
+                                                user.getId() == id
+                                )
                                 .findFirst()
                                 .orElse(null);
                     }
@@ -54,8 +57,23 @@ public class UserServiceTest {
                     public User findByEmail(String email) {
 
                         return users.stream()
-                                .filter(user ->
-                                        user.getEmail().equals(email)
+                                .filter(
+                                        user ->
+                                                user.getEmail()
+                                                        .equalsIgnoreCase(email)
+                                )
+                                .findFirst()
+                                .orElse(null);
+                    }
+
+                    @Override
+                    public User findByName(String name) {
+
+                        return users.stream()
+                                .filter(
+                                        user ->
+                                                user.getName()
+                                                        .equalsIgnoreCase(name)
                                 )
                                 .findFirst()
                                 .orElse(null);
@@ -63,6 +81,7 @@ public class UserServiceTest {
 
                     @Override
                     public List<User> findAll() {
+
                         return users;
                     }
                 };
@@ -201,6 +220,66 @@ public class UserServiceTest {
         assertThrows(
                 BankException.class,
                 () -> userService.getUserById(999)
+        );
+    }
+
+    @Test
+    void shouldFindUserByName() {
+
+        User created =
+                userService.createUser(
+                        "Ilias",
+                        "ilias@test.com",
+                        "password"
+                );
+
+        User found =
+                userService.getUserByName("Ilias");
+
+        assertNotNull(found);
+
+        assertEquals(
+                created.getId(),
+                found.getId()
+        );
+
+        assertEquals(
+                "Ilias",
+                found.getName()
+        );
+
+        assertEquals(
+                "ilias@test.com",
+                found.getEmail()
+        );
+    }
+
+    @Test
+    void shouldFindUserByNameIgnoringCase() {
+
+        userService.createUser(
+                "Ilias",
+                "ilias@test.com",
+                "password"
+        );
+
+        User found =
+                userService.getUserByName("ilias");
+
+        assertNotNull(found);
+
+        assertEquals(
+                "Ilias",
+                found.getName()
+        );
+    }
+
+    @Test
+    void shouldNotFindUserWithUnknownName() {
+
+        assertThrows(
+                BankException.class,
+                () -> userService.getUserByName("Nobody")
         );
     }
 }

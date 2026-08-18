@@ -5,6 +5,7 @@ C:\Users\ilias\OneDrive\Desktop\ProjectBank\bank-backend\src\main\java\com\bank\
 C:\Users\ilias\OneDrive\Desktop\ProjectBank\bank-backend\src\main\java\com\bank\controller\UserController.java
 C:\Users\ilias\OneDrive\Desktop\ProjectBank\bank-backend\src\main\java\com\bank\database\DatabaseConnection.java
 C:\Users\ilias\OneDrive\Desktop\ProjectBank\bank-backend\src\main\java\com\bank\dto\request\AccountRequest.java
+C:\Users\ilias\OneDrive\Desktop\ProjectBank\bank-backend\src\main\java\com\bank\dto\request\LoginRequest.java
 C:\Users\ilias\OneDrive\Desktop\ProjectBank\bank-backend\src\main\java\com\bank\dto\request\TransferRequest.java
 C:\Users\ilias\OneDrive\Desktop\ProjectBank\bank-backend\src\main\java\com\bank\dto\request\UserRequest.java
 C:\Users\ilias\OneDrive\Desktop\ProjectBank\bank-backend\src\main\java\com\bank\dto\response\AccountResponse.java

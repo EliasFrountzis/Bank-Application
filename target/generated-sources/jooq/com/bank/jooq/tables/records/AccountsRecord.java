@@ -76,6 +76,48 @@ public class AccountsRecord extends UpdatableRecordImpl<AccountsRecord> {
         return (String) get(3);
     }
 
+    /**
+     * Setter for <code>public.accounts.name</code>.
+     */
+    public void setName(String value) {
+        set(4, value);
+    }
+
+    /**
+     * Getter for <code>public.accounts.name</code>.
+     */
+    public String getName() {
+        return (String) get(4);
+    }
+
+    /**
+     * Setter for <code>public.accounts.type</code>.
+     */
+    public void setType(String value) {
+        set(5, value);
+    }
+
+    /**
+     * Getter for <code>public.accounts.type</code>.
+     */
+    public String getType() {
+        return (String) get(5);
+    }
+
+    /**
+     * Setter for <code>public.accounts.status</code>.
+     */
+    public void setStatus(String value) {
+        set(6, value);
+    }
+
+    /**
+     * Getter for <code>public.accounts.status</code>.
+     */
+    public String getStatus() {
+        return (String) get(6);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -99,13 +141,16 @@ public class AccountsRecord extends UpdatableRecordImpl<AccountsRecord> {
     /**
      * Create a detached, initialised AccountsRecord
      */
-    public AccountsRecord(Integer id, Integer userId, BigDecimal balance, String cardLast4) {
+    public AccountsRecord(Integer id, Integer userId, BigDecimal balance, String cardLast4, String name, String type, String status) {
         super(Accounts.ACCOUNTS);
 
         setId(id);
         setUserId(userId);
         setBalance(balance);
         setCardLast4(cardLast4);
+        setName(name);
+        setType(type);
+        setStatus(status);
         resetTouchedOnNotNull();
     }
 }

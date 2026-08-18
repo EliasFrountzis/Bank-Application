@@ -11,6 +11,7 @@ public interface AccountRepository {
 
     Account findById(int id);
 
-    void update(Account account);
+    List<Account> findByUserId(int userId);
 
+    void update(Account account);
 }

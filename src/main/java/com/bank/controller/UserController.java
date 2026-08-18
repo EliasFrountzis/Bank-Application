@@ -2,6 +2,7 @@ package com.bank.controller;
 
 import static spark.Spark.*;
 
+import com.bank.dto.request.LoginRequest;
 import com.bank.dto.request.UserRequest;
 import com.bank.dto.response.UserResponse;
 import com.bank.model.User;
@@ -23,6 +24,10 @@ public class UserController {
 
     public void registerRoutes() {
 
+        // =========================
+        // REGISTER
+        // =========================
+
         post("/users", (request, response) -> {
 
             UserRequest userRequest =
@@ -39,9 +44,87 @@ public class UserController {
                     );
 
             response.status(201);
+            response.type("application/json");
 
-            return gson.toJson(new UserResponse(user));
+            return gson.toJson(
+                    new UserResponse(user)
+            );
         });
+
+
+        // =========================
+        // LOGIN
+        // =========================
+
+        post("/login", (request, response) -> {
+
+            LoginRequest loginRequest =
+                    gson.fromJson(
+                            request.body(),
+                            LoginRequest.class
+                    );
+
+            User user =
+                    userService.login(
+                            loginRequest.getEmail(),
+                            loginRequest.getPassword()
+                    );
+
+            response.status(200);
+            response.type("application/json");
+
+            return gson.toJson(
+                    new UserResponse(user)
+            );
+        });
+
+
+        // =========================
+        // GET USER BY EMAIL
+        // =========================
+
+        get("/users/email", (request, response) -> {
+
+            String email =
+                    request.queryParams("email");
+
+            User user =
+                    userService.getUserByEmail(email);
+
+            response.status(200);
+            response.type("application/json");
+
+            return gson.toJson(
+                    new UserResponse(user)
+            );
+        });
+
+
+        // =========================
+        // GET USER BY NAME
+        // =========================
+
+        get("/users/name", (request, response) -> {
+
+            String name =
+                    request.queryParams("name");
+
+            User user =
+                    userService.getUserByName(name);
+
+            response.status(200);
+            response.type("application/json");
+
+            return gson.toJson(
+                    new UserResponse(user)
+            );
+        });
+
+
+        // =========================
+        // GET USER BY ID
+        // KEEP LAST
+        // =========================
 
         get("/users/:id", (request, response) -> {
 
@@ -54,9 +137,11 @@ public class UserController {
                     userService.getUserById(id);
 
             response.status(200);
+            response.type("application/json");
 
-            return gson.toJson(new UserResponse(user));
+            return gson.toJson(
+                    new UserResponse(user)
+            );
         });
     }
 }
-

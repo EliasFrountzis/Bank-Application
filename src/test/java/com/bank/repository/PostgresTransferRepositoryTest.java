@@ -21,10 +21,13 @@ public class PostgresTransferRepositoryTest
     @BeforeEach
     void setUp() throws Exception {
 
-        try (Connection connection =
-                     postgres.createConnection("");
-             Statement statement =
-                     connection.createStatement()) {
+        try (
+                Connection connection =
+                        postgres.createConnection("");
+
+                Statement statement =
+                        connection.createStatement()
+        ) {
 
             statement.executeUpdate(
                     "DELETE FROM transactions"
@@ -51,6 +54,7 @@ public class PostgresTransferRepositoryTest
         }
     }
 
+
     @Test
     void concurrentTransfersShouldNotAllowOverdraft()
             throws Exception {
@@ -61,27 +65,40 @@ public class PostgresTransferRepositoryTest
         TransferRepository transferRepository =
                 new PostgresTransferRepository();
 
+
         // Create sender with €100
+
         Account sender =
                 accountRepository.save(
                         new Account(
                                 0,
                                 1,
                                 100.00,
-                                "1111"
+                                "1111",
+                                "Concurrent Sender Account",
+                                "CURRENT",
+                                "ACTIVE"
                         )
                 );
 
-        // Create two receivers
+
+        // Create first receiver
+
         Account receiver1 =
                 accountRepository.save(
                         new Account(
                                 0,
                                 2,
                                 0.00,
-                                "2222"
+                                "2222",
+                                "Receiver 1 Account",
+                                "CURRENT",
+                                "ACTIVE"
                         )
                 );
+
+
+        // Create second receiver
 
         Account receiver2 =
                 accountRepository.save(
@@ -89,15 +106,21 @@ public class PostgresTransferRepositoryTest
                                 0,
                                 3,
                                 0.00,
-                                "3333"
+                                "3333",
+                                "Receiver 2 Account",
+                                "CURRENT",
+                                "ACTIVE"
                         )
                 );
+
 
         CountDownLatch startSignal =
                 new CountDownLatch(1);
 
+
         ExecutorService executor =
                 Executors.newFixedThreadPool(2);
+
 
         Future<Boolean> transfer1 =
                 executor.submit(() -> {
@@ -121,6 +144,7 @@ public class PostgresTransferRepositoryTest
                     }
                 });
 
+
         Future<Boolean> transfer2 =
                 executor.submit(() -> {
 
@@ -143,25 +167,40 @@ public class PostgresTransferRepositoryTest
                     }
                 });
 
+
         // Release both threads
+
         startSignal.countDown();
 
-        boolean result1 = transfer1.get();
-        boolean result2 = transfer2.get();
+
+        boolean result1 =
+                transfer1.get();
+
+        boolean result2 =
+                transfer2.get();
+
 
         executor.shutdown();
+
+
+        // Exactly one transfer should succeed
 
         assertTrue(
                 result1 ^ result2,
                 "Exactly one concurrent transfer should succeed"
         );
 
+
+        // Check sender balance
+
         Account finalSender =
                 accountRepository.findById(
                         sender.getId()
                 );
 
+
         assertNotNull(finalSender);
+
 
         assertEquals(
                 20.00,
@@ -169,40 +208,48 @@ public class PostgresTransferRepositoryTest
                 0.001
         );
 
+
+        // Check receiver balances
+
         Account finalReceiver1 =
                 accountRepository.findById(
                         receiver1.getId()
                 );
+
 
         Account finalReceiver2 =
                 accountRepository.findById(
                         receiver2.getId()
                 );
 
+
         assertNotNull(finalReceiver1);
+
         assertNotNull(finalReceiver2);
+
+
+        // Exactly one receiver should have received €80
 
         assertTrue(
                 (
                     Math.abs(
-                        finalReceiver1.getBalance() - 80.00
+                            finalReceiver1.getBalance() - 80.00
                     ) < 0.001
                     &&
                     Math.abs(
-                        finalReceiver2.getBalance()
+                            finalReceiver2.getBalance()
                     ) < 0.001
                 )
                 ||
                 (
                     Math.abs(
-                        finalReceiver1.getBalance()
+                            finalReceiver1.getBalance()
                     ) < 0.001
                     &&
                     Math.abs(
-                        finalReceiver2.getBalance() - 80.00
+                            finalReceiver2.getBalance() - 80.00
                     ) < 0.001
                 )
         );
     }
 }
-

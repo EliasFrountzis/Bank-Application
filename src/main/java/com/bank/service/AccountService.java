@@ -29,31 +29,62 @@ public class AccountService {
     public Account createAccount(
             int userId,
             double initialBalance,
-            String cardLast4
+            String cardLast4,
+            String name,
+            String type
     ) {
 
         userService.getUserById(userId);
 
+
         if (initialBalance < 0) {
+
             throw new BankException(
                     "Initial balance cannot be negative",
                     400
             );
         }
 
+
+        if (name == null || name.isBlank()) {
+
+            throw new BankException(
+                    "Account name cannot be empty",
+                    400
+            );
+        }
+
+
+        if (
+                !type.equals("CURRENT") &&
+                !type.equals("SAVINGS")
+        ) {
+
+            throw new BankException(
+                    "Account type must be CURRENT or SAVINGS",
+                    400
+            );
+        }
+
+
         Account account =
                 new Account(
                         0,
                         userId,
                         initialBalance,
-                        cardLast4
+                        cardLast4,
+                        name,
+                        type,
+                        "ACTIVE"
                 );
+
 
         return accountRepository.save(account);
     }
 
 
     public List<Account> getAccounts() {
+
         return accountRepository.findAll();
     }
 
@@ -63,20 +94,44 @@ public class AccountService {
         Account account =
                 accountRepository.findById(id);
 
+
         if (account == null) {
+
             throw new BankException(
                     "Account with id " + id + " not found",
                     404
             );
         }
 
+
         return account;
     }
 
 
     public void updateAccount(Account account) {
+
         accountRepository.update(account);
     }
+
+    public Account closeAccount(int accountId) {
+
+    Account account =
+            getAccountById(accountId);
+
+    if (account.getStatus().equals("CLOSED")) {
+
+        throw new BankException(
+                "Account is already closed",
+                400
+        );
+    }
+
+    account.close();
+
+    accountRepository.update(account);
+
+    return account;
+}
 
 
     public Account deposit(
@@ -85,14 +140,26 @@ public class AccountService {
     ) {
 
         if (amount <= 0) {
+
             throw new BankException(
                     "Deposit amount must be positive",
                     400
             );
         }
 
+
         Account account =
                 getAccountById(accountId);
+
+
+        if (account.getStatus().equals("CLOSED")) {
+
+            throw new BankException(
+                    "Cannot deposit into a closed account",
+                    400
+            );
+        }
+
 
         account.deposit(amount);
 
@@ -108,7 +175,9 @@ public class AccountService {
                         "Cash deposit"
                 );
 
+
         transactionRepository.save(transaction);
+
 
         return account;
     }
@@ -120,21 +189,35 @@ public class AccountService {
     ) {
 
         if (amount <= 0) {
+
             throw new BankException(
                     "Withdrawal amount must be positive",
                     400
             );
         }
 
+
         Account account =
                 getAccountById(accountId);
 
+
+        if (account.getStatus().equals("CLOSED")) {
+
+            throw new BankException(
+                    "Cannot withdraw from a closed account",
+                    400
+            );
+        }
+
+
         if (account.getBalance() < amount) {
+
             throw new BankException(
                     "Insufficient funds",
                     400
             );
         }
+
 
         account.withdraw(amount);
 
@@ -150,8 +233,20 @@ public class AccountService {
                         "Cash withdrawal"
                 );
 
+
         transactionRepository.save(transaction);
 
+
         return account;
+    }
+
+
+    public List<Account> getAccountsByUserId(
+            int userId
+    ) {
+
+        userService.getUserById(userId);
+
+        return accountRepository.findByUserId(userId);
     }
 }
