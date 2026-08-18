@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Account } from "../types/Account";
 import logo from "../assets/SPlogo.png";
 
-
 interface AccountOperationFormProps {
     account: Account;
     operation: "DEPOSIT" | "WITHDRAW";
@@ -23,9 +22,7 @@ function AccountOperationForm({
 
     const isDeposit = operation === "DEPOSIT";
 
-    async function handleSubmit(
-        event: React.FormEvent
-    ) {
+    async function handleSubmit(event: React.FormEvent) {
         event.preventDefault();
 
         setError("");
@@ -88,16 +85,16 @@ function AccountOperationForm({
     return (
         <div className="page">
 
-            <button
-                className="button-back"
-                onClick={onBack}
-                disabled={loading}
-            >
-                ← Back
-            </button>
-
-
             <div className="auth-card">
+
+                {/* Back button */}
+                <button
+                    className="button-back"
+                    onClick={onBack}
+                    disabled={loading}
+                >
+                    ← Back
+                </button>
 
                 <div className="auth-logo">
                     <img
@@ -106,13 +103,11 @@ function AccountOperationForm({
                     />
                 </div>
 
-
                 <h1>
                     {isDeposit
                         ? "Deposit Money"
                         : "Withdraw Money"}
                 </h1>
-
 
                 <p className="auth-subtitle">
                     {isDeposit
@@ -120,27 +115,25 @@ function AccountOperationForm({
                         : "Withdraw money from your account."}
                 </p>
 
-
                 <div className="account-details-hero">
 
-    <div className="account-details-type">
-        {account.type}
-    </div>
+                    <div className="account-details-type">
+                        {account.type}
+                    </div>
 
-    <h2>
-        {account.name}
-    </h2>
+                    <h2>
+                        {account.name}
+                    </h2>
 
-    <p className="account-card-number">
-        Card •••• {account.cardLast4}
-    </p>
+                    <p className="account-card-number">
+                        Card •••• {account.cardLast4}
+                    </p>
 
-    <div className="account-details-balance">
-        €{account.balance.toFixed(2)}
-    </div>
+                    <div className="account-details-balance">
+                        €{account.balance.toFixed(2)}
+                    </div>
 
-</div>
-
+                </div>
 
                 <form
                     className="auth-form"
@@ -169,17 +162,15 @@ function AccountOperationForm({
 
                     </div>
 
-
                     {error && (
                         <p className="auth-error">
                             {error}
                         </p>
                     )}
 
-
                     <div className="form-actions">
 
-                       <button
+                        <button
                             type="button"
                             className="button-back"
                             onClick={onBack}
@@ -187,7 +178,6 @@ function AccountOperationForm({
                         >
                             Cancel
                         </button>
-
 
                         <button
                             type="submit"

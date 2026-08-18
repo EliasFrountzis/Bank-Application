@@ -31,14 +31,7 @@ function Navbar({ onLogout }: NavbarProps) {
                         Dashboard
                     </span>
 
-                    <span className="nav-link">
-                        Accounts
-                    </span>
-
-                    <span className="nav-link">
-                        Transactions
-                    </span>
-
+                    
                     <button
                         className="logout-button"
                         onClick={onLogout}
