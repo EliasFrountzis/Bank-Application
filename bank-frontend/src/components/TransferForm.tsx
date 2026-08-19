@@ -231,9 +231,7 @@ function TransferForm({
 
             <div className="auth-card">
 
-                {/* =========================
-                    BACK
-                ========================= */}
+                {/* BACK */}
 
                 <button
                     className="account-back-button"
@@ -243,9 +241,7 @@ function TransferForm({
                 </button>
 
 
-                {/* =========================
-                    LOGO / HEADER
-                ========================= */}
+                {/* LOGO / HEADER */}
 
                 <div className="auth-logo">
                     <img
@@ -263,9 +259,7 @@ function TransferForm({
                 </p>
 
 
-                {/* =========================
-                    FROM ACCOUNT
-                ========================= */}
+                {/*  FROM ACCOUNT */}
 
                 <div className="account-details-hero">
 
@@ -289,9 +283,7 @@ function TransferForm({
                 </div>
 
 
-                {/* =========================
-                    TRANSFER FORM
-                ========================= */}
+                {/* TRANSFER FORM */}
 
                 <form
                     className="auth-form"
@@ -449,9 +441,7 @@ function TransferForm({
                             </div>
 
 
-                            {/* =========================
-                                AMOUNT
-                            ========================= */}
+                            {/* AMOUNT */}
 
                             <div className="form-group">
 
@@ -499,9 +489,7 @@ function TransferForm({
                             </div>
 
 
-                            {/* =========================
-                                BUTTONS
-                            ========================= */}
+                            {/*  BUTTONS */}
 
                             <div className="form-actions">
 
