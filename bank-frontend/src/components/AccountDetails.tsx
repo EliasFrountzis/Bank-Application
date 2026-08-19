@@ -211,9 +211,9 @@ function AccountDetails({
             .reverse();
 
 
-    // =========================
+   
     // DEPOSIT / WITHDRAW
-    // =========================
+   
 
     if (operation !== null) {
 
@@ -275,7 +275,7 @@ function AccountDetails({
                 </div>
 
 
-                {/* ACCOUNT HERO */}
+                {}
 
                 <div className="account-details-hero">
 
