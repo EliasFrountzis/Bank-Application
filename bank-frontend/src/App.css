@@ -1,6 +1,4 @@
-/* =========================================
-   GLOBAL
-========================================= */
+/* GLOBAL */
 
 :root {
     --black: #0d120f;
@@ -38,9 +36,7 @@
 }
 
 
-/* =========================================
-   RESET
-========================================= */
+/* RESET */
 
 * {
     box-sizing: border-box;
@@ -77,9 +73,7 @@ button {
 }
 
 
-/* =========================================
-   LOGO
-========================================= */
+/*  LOGO */
 
 .logo {
     width: 45px;
@@ -88,9 +82,7 @@ button {
 }
 
 
-/* =========================================
-   NAVBAR
-========================================= */
+/* NAVBAR */
 
 .navbar {
     background: var(--black);
@@ -161,9 +153,7 @@ button {
 }
 
 
-/* =========================================
-   NAVBAR / SETTINGS BUTTONS
-========================================= */
+/* NAVBAR / SETTINGS BUTTONS */
 
 .logout-button,
 .account-settings-button {
@@ -189,9 +179,7 @@ button {
     border-color: var(--gold);
 }
 
-/* =========================================
-   ACCOUNT SETTINGS
-========================================= */
+/* ACCOUNT SETTINGS */
 
 .account-settings-back-button {
     background: transparent;
@@ -285,9 +273,7 @@ button {
 }
 
 
-/* =========================================
-   SHARED BACK BUTTON
-========================================= */
+/* SHARED BACK BUTTON */
 
 .button-back,
 .account-back-button {
@@ -314,9 +300,7 @@ button {
 }
 
 
-/* =========================================
-   DASHBOARD
-========================================= */
+/* DASHBOARD */
 
 .dashboard {
     max-width: 1200px;
@@ -351,9 +335,7 @@ button {
 }
 
 
-/* =========================================
-   BUTTONS
-========================================= */
+/*  BUTTONS */
 
 .button {
     border: none;
@@ -427,9 +409,7 @@ button {
 }
 
 
-/* =========================================
-   CREATE ACCOUNT
-========================================= */
+/* CREATE ACCOUNT */
 
 .create-account-button {
     border: none;
@@ -456,9 +436,7 @@ button {
 }
 
 
-/* =========================================
-   ACCOUNTS
-========================================= */
+/* ACCOUNTS */
 
 .accounts-section h2 {
     margin-bottom: 18px;
@@ -573,9 +551,7 @@ button {
 }
 
 
-/* =========================================
-   PAGE LAYOUT
-========================================= */
+/* PAGE LAYOUT */
 
 .page {
     max-width: 900px;
@@ -608,9 +584,7 @@ button {
 }
 
 
-/* =========================================
-   PANELS / CARDS
-========================================= */
+/* PANELS / CARDS */
 
 .panel {
     background: var(--white);
@@ -629,9 +603,7 @@ button {
 }
 
 
-/* =========================================
-   FORMS
-========================================= */
+/*  FORMS */
 
 .form {
     display: flex;
@@ -693,9 +665,7 @@ button {
 }
 
 
-/* =========================================
-   AUTH PAGES
-========================================= */
+/* AUTH PAGES */
 
 .auth-page {
     min-height: 100vh;
@@ -717,9 +687,7 @@ button {
 }
 
 
-/* =========================================
-   AUTH CARD
-========================================= */
+/* AUTH CARD */
 
 .auth-card {
     width: 100%;
@@ -741,9 +709,7 @@ button {
 }
 
 
-/* =========================================
-   AUTH LOGO
-========================================= */
+/* AUTH LOGO */
 
 .auth-logo {
     display: flex;
@@ -762,9 +728,7 @@ button {
 }
 
 
-/* =========================================
-   AUTH TITLES
-========================================= */
+/* AUTH TITLES */
 
 .auth-card h1 {
     margin: 0 0 8px;
@@ -789,9 +753,7 @@ button {
 }
 
 
-/* =========================================
-   AUTH FORM
-========================================= */
+/* AUTH FORM */
 
 .auth-form {
     display: flex;
@@ -849,9 +811,7 @@ button {
 }
 
 
-/* =========================================
-   AUTH SUBMIT BUTTON
-========================================= */
+/*  AUTH SUBMIT BUTTON */
 
 .auth-submit {
     width: 100%;
@@ -899,9 +859,7 @@ button {
 }
 
 
-/* =========================================
-   AUTH ERROR
-========================================= */
+/* AUTH ERROR */
 
 .auth-error {
     margin: 0;
@@ -922,9 +880,7 @@ button {
 }
 
 
-/* =========================================
-   AUTH FOOTER
-========================================= */
+/* AUTH FOOTER */
 
 .auth-footer {
     display: flex;
@@ -963,9 +919,7 @@ button {
 }
 
 
-/* =========================================
-   TRANSACTIONS
-========================================= */
+/* TRANSACTIONS */
 
 .transaction-list {
     margin-top: 20px;
@@ -1012,9 +966,7 @@ button {
 }
 
 
-/* =========================================
-   ACCOUNT DETAILS PAGE
-========================================= */
+/* ACCOUNT DETAILS PAGE */
 
 .account-details-page {
     min-height: 100vh;
@@ -1033,9 +985,7 @@ button {
 }
 
 
-/* =========================================
-   ACCOUNT DETAILS HEADER
-========================================= */
+/* ACCOUNT DETAILS HEADER */
 
 .account-details-header {
     display: flex;
@@ -1048,9 +998,7 @@ button {
 }
 
 
-/* =========================================
-   ACCOUNT DETAILS HERO
-========================================= */
+/* ACCOUNT DETAILS HERO */
 
 .account-details-hero {
     background: var(--black);
@@ -1066,10 +1014,7 @@ button {
     box-shadow:
         0 10px 30px rgba(0, 0, 0, 0.25);
 
-    /*
-       Makes the account feel like it is
-       expanding into the page.
-    */
+   
 }
 
 .account-details-type {
@@ -1109,9 +1054,7 @@ button {
 }
 
 
-/* =========================================
-   TRANSACTIONS PANEL
-========================================= */
+/* TRANSACTIONS PANEL */
 
 .transactions-panel {
     background:
@@ -1171,9 +1114,7 @@ button {
 }
 
 
-/* =========================================
-   ACCOUNT TRANSACTION ROW
-========================================= */
+/* ACCOUNT TRANSACTION ROW */
 
 .account-transaction-row {
     display: flex;
@@ -1201,9 +1142,7 @@ button {
 }
 
 
-/* =========================================
-   ACCOUNT DETAILS ACTIONS
-========================================= */
+/* ACCOUNT DETAILS ACTIONS */
 
 .account-details-actions {
     display: flex;
@@ -1216,9 +1155,7 @@ button {
 }
 
 
-/* =========================================
-   ALL TRANSACTIONS
-========================================= */
+/* ALL TRANSACTIONS */
 
 .all-transactions > h2 {
     margin: 25px 0 18px;
@@ -1258,9 +1195,7 @@ button {
 }
 
 
-/* =========================================
-   DANGER ZONE
-========================================= */
+/* DANGER ZONE */
 
 .danger-zone {
     margin-top: 35px;
@@ -1293,9 +1228,7 @@ button {
 }
 
 
-/* =========================================
-   ERROR / MESSAGE
-========================================= */
+/* ERROR / MESSAGE */
 
 .error-message {
     color: var(--danger);
@@ -1310,9 +1243,7 @@ button {
 }
 
 
-/* =========================================
-   TRANSFER RECIPIENT
-========================================= */
+/* TRANSFER RECIPIENT */
 
 .transfer-recipient {
     margin-top: 5px;
@@ -1360,9 +1291,7 @@ button {
     color: rgb(253, 245, 197);
 }
 
-/* =========================================
-   RESPONSIVE
-========================================= */
+/*  RESPONSIVE */
 
 @media (max-width: 700px) {
 
