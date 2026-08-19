@@ -90,9 +90,7 @@ function TransferConfirmation({
 
             <div className="auth-card">
 
-                {/* =========================
-                    BACK
-                ========================= */}
+                {/* BACK BUTTON */}
 
                 <button
                     className="account-back-button"
@@ -118,9 +116,7 @@ function TransferConfirmation({
                 </p>
 
 
-                {/* =========================
-                    FROM
-                ========================= */}
+                {/* FROM */}
 <div className="transfer-recipient">
 
     <div className="account-details-type">
@@ -151,9 +147,7 @@ function TransferConfirmation({
 </div>
 
 
-                {/* =========================
-                    TO
-                ========================= */}
+                {/* TO*/}
 <div className="transfer-recipient">
 
     <div className="account-details-type">
@@ -188,9 +182,7 @@ function TransferConfirmation({
 </div>
 
 
-                {/* =========================
-                    TRANSFER DETAILS
-                ========================= */}
+                {/* TRANSFER DETAILS*/}
 
                 <div
                     style={{
@@ -248,9 +240,7 @@ function TransferConfirmation({
                 </div>
 
 
-                {/* =========================
-                    BUTTONS
-                ========================= */}
+                {/*  BUTTONS */}
 
                 <div
                     className="form-actions"
